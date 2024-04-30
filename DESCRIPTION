@@ -1,11 +1,26 @@
 Package: gdiviz
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Tools for IOM-themed Plots
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Kenneth S. Reyes
+Maintainer: Kenneth S. Reyes <kereyes@iom.in>
+Description: Tools for generating aesthetic plots with the International
+    Organization for Migration visual branding. Developed and maintained by the
+    IOM Global Data Insitute.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Depends: 
+    R (>= 4.3.3) 
+Imports: 
+    dplyr,     
+    tidyr,     
+    tidyselect,     
+    readxl,     
+    glue,
+    ggtext,
+    rlang,     
+    DBI,     
+    duckdb
+Roxygen: list(markdown = TRUE) 
+RoxygenNote: 7.3.1
