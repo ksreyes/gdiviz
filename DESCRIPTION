@@ -13,14 +13,20 @@ LazyData: true
 Depends: 
     R (>= 4.3.3) 
 Imports: 
-    dplyr,     
-    tidyr,     
-    tidyselect,     
-    readxl,     
+    dplyr,
+    tidyr,
+    tidyselect,
+    tibble,
+    stringr,
+    forcats,
+    readxl,
     glue,
+    ggplot2,
+    cowplot,
+    ggrepel,
     ggtext,
-    rlang,     
-    DBI,     
+    rlang,
+    DBI,
     duckdb
 Roxygen: list(markdown = TRUE) 
 RoxygenNote: 7.3.1
