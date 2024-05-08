@@ -35,12 +35,12 @@ prettylabel <- function(N,
 
       magnitude <- abs(n) |> log10() |> floor()
 
-      # if (is.na(magnitude)) {
-      #   labels <- c(labels, NA)
-      #   next
-      # }
+      if (is.na(magnitude)) {
+        labels <- c(labels, NA)
+        next
+      }
 
-      labeler <- function(divide = 1, suffix = NULL) {
+      labeler <- function(n, magnitude, divide = 1, suffix = NULL) {
 
         m <- n / divide
         new_magnitude <- abs(m) |> log10() |> floor()
@@ -62,11 +62,11 @@ prettylabel <- function(N,
       }
 
       label <- dplyr::case_when(
-        magnitude >= 12 & magnitude < 15 ~ labeler(10^12, "T"),
-        magnitude >= 9  & magnitude < 12 ~ labeler(10^9, "B"),
-        magnitude >= 6  & magnitude < 9  ~ labeler(10^6, "M"),
-        magnitude >= 3  & magnitude < 6  ~ labeler(10^3, "K"),
-        magnitude < 3                    ~ labeler(),
+        magnitude >= 12 & magnitude < 15 ~ labeler(n, magnitude, 10^12, "T"),
+        magnitude >= 9  & magnitude < 12 ~ labeler(n, magnitude, 10^9, "B"),
+        magnitude >= 6  & magnitude < 9  ~ labeler(n, magnitude, 10^6, "M"),
+        magnitude >= 3  & magnitude < 6  ~ labeler(n, magnitude, 10^3, "K"),
+        magnitude < 3                    ~ labeler(n, magnitude),
         .default = "0"
       )
 

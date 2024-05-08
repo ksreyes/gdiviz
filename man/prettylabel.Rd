@@ -17,7 +17,7 @@ prettylabel(
 \arguments{
 \item{N}{Number or vector of numbers to be formatted.}
 
-\item{d}{Decimal places.}
+\item{d}{Decimal places. Does not apply if \code{shorten=TRUE}.}
 
 \item{dotzero}{Whether to include zeros after the decimal point.}
 

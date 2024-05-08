@@ -1,4 +1,4 @@
-#' Apply basic IOM theme
+#' Apply IOM theme to a plot
 #'
 #' Adds thematic presets adhering to the IOM visual branding to a ggplot object.
 #'
@@ -98,7 +98,7 @@ apply_theme <- function(type, basesize = 10, facets = FALSE) {
 
     theme_barh <- list(
       scale_x_continuous(
-        labels = pretty,
+        labels = prettylabel,
         expand = expansion(mult = c(.02, .1))
       ),
       theme(
@@ -116,7 +116,7 @@ apply_theme <- function(type, basesize = 10, facets = FALSE) {
 
     theme_barv <- list(
       scale_y_continuous(
-        labels = pretty,
+        labels = prettylabel,
         expand = expansion(mult = c(.02, .1))
       ),
       theme(

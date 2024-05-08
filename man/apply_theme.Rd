@@ -2,7 +2,7 @@
 % Please edit documentation in R/apply_theme.R
 \name{apply_theme}
 \alias{apply_theme}
-\title{Apply basic IOM theme}
+\title{Apply IOM theme to a plot}
 \usage{
 apply_theme(type, basesize = 10, facets = FALSE)
 }

@@ -2,3 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+.DS_store
+
+test
+data-raw/raw
+data-raw/*.xlsx
+data-raw/*.csv
