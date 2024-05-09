@@ -1,15 +1,12 @@
 
 
 countryname <- function(key, from = "iso3c", to = "unname") {
-
   out <- c()
-
   for (k in key) {
     hit <- countrynames[{to}][countrynames[{from}] == toupper(k)]
     if (length(hit) == 0) out <- c(out, NA)
     else out <- c(out, hit)
   }
-
   return(out)
 }
 
@@ -33,17 +30,18 @@ namer <- function(hero, max_name) {
 plot_ider <- function(plot_code) {
   list(
     code = plot_code,
-    title = filter(gdiplots, code == plot_code)$title,
-    source = filter(gdiplots, code == plot_code)$source
+    title = dplyr::filter(gdiplots, .data$code == plot_code)$title,
+    source = dplyr::filter(gdiplots, .data$code == plot_code)$source
   )
 }
 
 get_last <- function(data, group, group2 = NULL) {
-  data1 <- data |> dplyr::select(t, {{ group }}, {{ group2 }}, v) |>
+  data1 <- data |>
+    dplyr::select(.data$t, {{ group }}, {{ group2 }}, .data$v) |>
     tidyr::drop_na() |>
-    dplyr::mutate(Max = max(t), .by = {{ group }})
+    dplyr::mutate(max = max(.data$t), .by = {{ group }})
   dplyr::left_join(data, data1) |>
-    dplyr::filter(t == Max) |>
+    dplyr::filter(.data$t == .data$max) |>
     suppressMessages()
 }
 
@@ -56,24 +54,19 @@ add_labels <- function(df,
                        worldmedian = TRUE,
                        colorscale) {
 
-  size <- list(
-    text = basesize,
-    title = basesize + 2,
-    stext = basesize - 1,
-    footnote = basesize - 2
-  )
+  size <- sizer(basesize)
 
   labels <- list(
     ggrepel::geom_label_repel(
       mapping = ggplot2::aes(
-        x = factor(t), y = v,
+        x = factor(.data$t), y = .data$v,
         fill = {{ group }},
-        label = prettylabel(v, pct = pct, currency = currency)
+        label = prettylabel(.data$v, pct = pct, currency = currency)
       ),
       data = get_last({{ df }}, {{ group }}, {{ group2 }}) |>
         dplyr::filter({{ group }} != "World median"),
       color = "white",
-      size = size$text / .pt,
+      size = size$text / ggplot2::.pt,
       fontface = "bold",
       hjust = .5,
       vjust = .5,
@@ -92,7 +85,9 @@ add_labels <- function(df,
   if (worldmedian) {
     labels <- c(
       labels,
-      list(ggplot2::scale_linetype_manual(values = c("solid", "22", "solid", "solid")))
+      list(ggplot2::scale_linetype_manual(
+        values = c("solid", "22", "solid", "solid")
+      ))
     )
   } else {
     labels <- c(labels, list(ggplot2::scale_linetype_manual(values = "solid")))
@@ -121,7 +116,9 @@ format_source <- function(source, basesize, space_after = TRUE) {
 
 span <- function(data) c(min(data$t), max(data$t)) |> as.numeric()
 
-range <- function(data, collapse = "-") stringr::str_flatten(span(data), collapse)
+range <- function(data, collapse = "-") {
+  stringr::str_flatten(span(data), collapse)
+}
 
 plot_label <- function(plot, label, basesize = basesize, span = 2, h = .06) {
 

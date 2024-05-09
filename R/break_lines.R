@@ -3,8 +3,6 @@
 #' @param text String to add line breaks to.
 #' @param maxchars Maximum number of characters per line.
 #'
-#' @return String.
-#'
 #' @export
 break_lines <- function(text, maxchars, strip = NULL) {
 

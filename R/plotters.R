@@ -1,8 +1,4 @@
 
-library(dplyr)
-library(ggplot2)
-library(cowplot)
-
 # Migrant stocks ----------------------------------------------------------
 
 plot_stocks <- function(hero,
@@ -16,61 +12,69 @@ plot_stocks <- function(hero,
   size <- sizer(basesize)
   max_name <- (width / basesize) * 15
   max_caption <- (width / basesize) * 55
-  k <- function(factor = 1) factor * size$text / .pt
+  k <- function(factor = 1) factor * size$text / ggplot2::.pt
   ids <- plot_ider("stocks")
   name <- namer(hero, max_name)
 
   # Data
-  df <- bind_rows(
+  df <- dplyr::bind_rows(
     stocks |>
-      filter(from == hero & sex == "Total") |>
-      summarise(v = sum(v), .by = c(from, t)) |>
-      mutate(type = "Emigrants") |>
-      rename(iso = from),
+      dplyr::filter(.data$from == hero & .data$sex == "Total") |>
+      dplyr::summarise(v = sum(.data$v), .by = c(.data$from, .data$t)) |>
+      dplyr::mutate(type = "Emigrants") |>
+      dplyr::rename(iso = .data$from),
     stocks |>
-      filter(to == hero & sex == "Total") |>
-      summarise(v = sum(v), .by = c(to, t)) |>
-      mutate(type = "Immigrants") |>
-      rename(iso = to)
+      dplyr::filter(.data$to == hero & .data$sex == "Total") |>
+      dplyr::summarise(v = sum(.data$v), .by = c(.data$to, .data$t)) |>
+      dplyr::mutate(type = "Immigrants") |>
+      dplyr::rename(iso = .data$to)
   )
 
   if (nrow(df) > 0) {
 
-    plot <- ggplot(
+    plot <- ggplot2::ggplot(
       df,
-      aes(x = factor(t), y = v, color = type, group = type)
+      ggplot2::aes(
+        x = factor(.data$t),
+        y = .data$v,
+        color = .data$type,
+        group = .data$type
+      )
     ) +
-      geom_line(linewidth = k(.3)) +
-      scale_color_manual(values = c(pal("blues"), pal("reds", 2))) +
+      ggplot2::geom_line(linewidth = k(.3)) +
+      ggplot2::scale_color_manual(values = c(pal("blues"), pal("reds", 2))) +
       add_labels(
-        df, type,
+        df, .data$type,
         basesize = basesize,
         colorscale = c(pal("blues"), pal("reds", 2))
       ) +
 
       # Aesthetics
       apply_theme(type = "line", basesize) +
-      scale_x_discrete(
+      ggplot2::scale_x_discrete(
         breaks = seq(span(df)[1], span(df)[2], 10),
-        expand = expansion(mult = c(.01, .1))
+        expand = ggplot2::expansion(mult = c(.01, .1))
       ) +
-      scale_y_continuous(name = scale_title(df), labels = scale_labels) +
-      theme(
-        axis.title.y = element_text(
+      ggplot2::scale_y_continuous(
+        name = scale_title(df),
+        labels = scale_labels
+      ) +
+      ggplot2::theme(
+        axis.title.y = ggplot2::element_text(
           size = size$text,
-          margin = margin(r = k(3.5))
+          margin = ggplot2::margin(r = k(3.5))
         ))
 
     # Title
     title_auto <- paste0(ids$title, ", ", range(df))
     if (is.logical(title) & title == TRUE) {
-      plot <- plot + ggtitle(title_auto)
+      plot <- plot + ggplot2::ggtitle(title_auto)
     } else if (is.character(title) | is.numeric(title)) {
-      plot <- plot + ggtitle(title)
+      plot <- plot + ggplot2::ggtitle(title)
     }
 
     # Caption
-    caption_set <- filter(captions, CountryCode == hero)
+    caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
     if (is.logical(caption) & caption == TRUE & nrow(caption_set) > 0) {
       cap1 <- gsub(
         pattern = hero,
@@ -106,11 +110,11 @@ plot_stocks <- function(hero,
 
     # Fallback if data is missing
 
-    plot <- ggplot() + apply_theme(type = "void", basesize)
+    plot <- ggplot2::ggplot() + apply_theme(type = "void", basesize)
     if (is.logical(title) & title == TRUE) {
-      plot <- plot + ggtitle(ids$title)
+      plot <- plot + ggplot2::ggtitle(ids$title)
     } else if (is.character(title) | is.numeric(title)) {
-      plot <- plot + ggtitle(title)
+      plot <- plot + ggplot2::ggtitle(title)
     }
     if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
@@ -124,9 +128,9 @@ plot_stocks <- function(hero,
         space_after = FALSE
       )
     }
-    plot <- plot + labs(caption = caption_text)
-    plot <- ggdraw(plot) +
-      draw_label("No data", color = pal("blues", 3), size = size$text)
+    plot <- plot + ggplot2::labs(caption = caption_text)
+    plot <- cowplot::ggdraw(plot) +
+      cowplot::draw_label("No data", color = pal("blues", 3), size = size$text)
   }
 
   return(plot)
@@ -145,57 +149,78 @@ plot_srat <- function(hero,
   size <- sizer(basesize)
   max_name <- (width / basesize) * 15
   max_caption <- (width / basesize) * 55
-  k <- function(factor = 1) factor * size$text / .pt
+  k <- function(factor = 1) factor * size$text / ggplot2::.pt
   ids <- plot_ider("srat")
   name <- namer(hero, max_name)
 
   # Data
-  df <- bind_rows(
+  df <- dplyr::bind_rows(
     stocks |>
-      filter(from == hero & sex != "Total" & t == max(t)) |>
-      summarise(v = sum(v), .by = c(from, sex, t)) |>
-      mutate(type = "Emigrants") |>
-      rename(iso = from),
+      dplyr::filter(
+        .data$from == hero &
+          .data$sex != "Total" &
+          .data$t == max(.data$t)
+      ) |>
+      dplyr::summarise(
+        v = sum(.data$v),
+        .by = c(.data$from, .data$sex, .data$t)
+      ) |>
+      dplyr::mutate(type = "Emigrants") |>
+      dplyr::rename(iso = .data$from),
     stocks |>
-      filter(to == hero & sex != "Total" & t == max(t)) |>
-      summarise(v = sum(v), .by = c(to, sex, t)) |>
-      mutate(type = "Immigrants") |>
-      rename(iso = to)
+      dplyr::filter(
+        .data$to == hero &
+          .data$sex != "Total" &
+          .data$t == max(.data$t)
+      ) |>
+      dplyr::summarise(
+        v = sum(.data$v),
+        .by = c(.data$to, .data$sex, .data$t)
+      ) |>
+      dplyr::mutate(type = "Immigrants") |>
+      dplyr::rename(iso = .data$to)
   ) |>
-    mutate(
-      v = v / sum(v),
-      pos = case_when(sex == "Male" ~ .1, .default = .9),
-      .by = c(t, type)
+    dplyr::mutate(
+      v = .data$v / sum(.data$v),
+      pos = dplyr::case_when(.data$sex == "Male" ~ .1, .default = .9),
+      .by = c(.data$t, .data$type)
     )
 
   if (nrow(df) > 0) {
 
-    plot <- ggplot(df, aes(x = 100 * v, y = factor(t), fill = sex)) +
-      geom_bar(stat = "identity", position = "fill", width = .7) +
-      scale_fill_manual(values = c(pal("blues", 3), pal("blues", 2))) +
-      facet_wrap(~ type, nrow = 2) +
+    plot <- ggplot2::ggplot(
+      df,
+      ggplot2::aes(x = 100 * .data$v, y = factor(.data$t), fill = .data$sex)
+    ) +
+      ggplot2::geom_bar(stat = "identity", position = "fill", width = .7) +
+      ggplot2::scale_fill_manual(values = c(pal("blues", 3), pal("blues", 2))) +
+      ggplot2::facet_wrap(~ type, nrow = 2) +
       linemarker("v", at = .5) +
-      geom_text(
-        aes(x = pos, label = prettylabel(100 * v, pct = TRUE)),
+      ggplot2::geom_text(
+        ggplot2::aes(
+          x = .data$pos,
+          label = prettylabel(100 * .data$v, pct = TRUE)
+        ),
         size = k(), fontface = "bold", color = "white", hjust = .5
       ) +
 
       # Aesthetics
       apply_theme(type = "bar-horizontal", basesize, facets = TRUE) +
-      scale_x_continuous(breaks = .5, labels = "50%") +
-      guides(fill = guide_legend(reverse = TRUE)) +
-      theme(panel.spacing.y = unit(k(5), "points"))
+      ggplot2::scale_x_continuous(breaks = .5, labels = "50%") +
+      ggplot2::guides(fill = ggplot2::guide_legend(reverse = TRUE)) +
+      ggplot2::theme(panel.spacing.y = grid::unit(k(5), "points"))
 
     # Title
     if (is.logical(title) & title == TRUE) {
-      plot <- plot + ggtitle(stringr::str_glue("{ids$title}, {df$t[1]}"))
+      plot <- plot +
+        ggplot2::ggtitle(stringr::str_glue("{ids$title}, {df$t[1]}"))
     } else if (is.character(title) | is.numeric(title)) {
-      plot <- plot + ggtitle(title)
+      plot <- plot + ggplot2::ggtitle(title)
     }
 
     # Caption
     if (is.logical(caption) & caption == TRUE) {
-      caption_set <- filter(captions, CountryCode == hero)
+      caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
       cap <- gsub(pattern = hero, replacement = name, caption_set$Sex)
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
@@ -213,17 +238,17 @@ plot_srat <- function(hero,
         space_after = FALSE
       )
     }
-    plot <- plot + labs(caption = caption_text)
+    plot <- plot + ggplot2::labs(caption = caption_text)
 
   } else {
 
     # Fallback if data is missing
 
-    plot <- ggplot() + apply_theme(type = "void", basesize)
+    plot <- ggplot2::ggplot() + apply_theme(type = "void", basesize)
     if (is.logical(title) & title == TRUE) {
-      plot <- plot + ggtitle(ids$title)
+      plot <- plot + ggplot2::ggtitle(ids$title)
     } else if (is.character(title) | is.numeric(title)) {
-      plot <- plot + ggtitle(title)
+      plot <- plot + ggplot2::ggtitle(title)
     }
     if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
@@ -237,9 +262,9 @@ plot_srat <- function(hero,
         space_after = FALSE
       )
     }
-    plot <- plot + labs(caption = caption_text)
-    plot <- ggdraw(plot) +
-      draw_label("No data", color = pal("blues", 3), size = size$text)
+    plot <- plot + ggplot2::labs(caption = caption_text)
+    plot <- cowplot::ggdraw(plot) +
+      cowplot::draw_label("No data", color = pal("blues", 3), size = size$text)
   }
 
   return(plot)
@@ -258,59 +283,70 @@ plot_dest <- function(hero,
   size <- sizer(basesize)
   max_name <- (width / basesize) * 15
   max_caption <- (width / basesize) * 55
-  k <- function(factor = 1) factor * size$text / .pt
+  k <- function(factor = 1) factor * size$text / ggplot2::.pt
   ids <- plot_ider("dest")
   name <- namer(hero, max_name)
   threshold <- 5
 
   # Data
   df <- stocks |>
-    filter(from == hero & sex == "Total" & t == max(t)) |>
-    arrange(desc(v)) |>
-    mutate(
-      rank = 1:n(),
-      country = case_when(
-        rank > threshold ~ "Others",
-        nchar(countryname(to)) <= max_name ~ countryname(to),
-        .default = to
+    dplyr::filter(
+      .data$from == hero &
+        .data$sex == "Total" &
+        .data$t == max(.data$t)
+    ) |>
+    dplyr::arrange(dplyr::desc(.data$v)) |>
+    dplyr::mutate(
+      rank = 1:dplyr::n(),
+      country = dplyr::case_when(
+        .data$rank > threshold ~ "Others",
+        nchar(countryname(.data$to)) <= max_name ~ countryname(.data$to),
+        .default = .data$to
       )
     ) |>
-    summarise(v = sum(v), .by = c(from, t, country)) |>
-    mutate(
-      v = v / sum(v),
-      country = forcats::fct_reorder(country, v),
-      country = forcats::fct_relevel(country, "Others", after = 0)
+    dplyr::summarise(
+      v = sum(.data$v),
+      .by = c(.data$from, .data$t, .data$country)
+    ) |>
+    dplyr::mutate(
+      v = .data$v / sum(.data$v),
+      country = forcats::fct_reorder(.data$country, .data$v),
+      country = forcats::fct_relevel(.data$country, "Others", after = 0)
     )
 
   if (nrow(df) > 0) {
 
-    plot <- ggplot(df, aes(x = 100 * v, y = country)) +
-      geom_bar(stat = "identity", fill = pal("blues", 2), width = .7) +
+    plot <- ggplot2::ggplot(
+      df,
+      ggplot2::aes(x = 100 * .data$v, y = .data$country)
+    ) +
+      ggplot2::geom_bar(stat = "identity", fill = pal("blues", 2), width = .7) +
       linemarker("v") +
-      geom_text(
-        mapping = aes(label = prettylabel(100 * v, pct = TRUE)),
+      ggplot2::geom_text(
+        mapping = ggplot2::aes(label = prettylabel(100 * .data$v, pct = TRUE)),
         size = k(), color = pal("blues"), fontface = "bold",
         hjust = 0, vjust = .5, nudge_x = 1
       ) +
 
       # Aesthetics
       apply_theme(type = "bar-horizontal", basesize) +
-      scale_x_continuous(
+      ggplot2::scale_x_continuous(
         labels = function(x) prettylabel(x, pct = TRUE),
-        expand = expansion(mult = c(.02, .15))
+        expand = ggplot2::expansion(mult = c(.02, .15))
       ) +
-      theme(plot.margin = margin(k(5), k(3.5), k(5), k(3.5)))
+      ggplot2::theme(plot.margin = ggplot2::margin(k(5), k(3.5), k(5), k(3.5)))
 
     # Title
     if (is.logical(title) & title == TRUE) {
-      plot <- plot + ggtitle(stringr::str_glue("{ids$title} ({df$t[1]})"))
+      plot <- plot +
+        ggplot2::ggtitle(stringr::str_glue("{ids$title} ({df$t[1]})"))
     } else if (is.character(title) | is.numeric(title)) {
-      plot <- plot + ggtitle(title)
+      plot <- plot + ggplot2::ggtitle(title)
     }
 
     # Caption
     if (is.logical(caption) & caption == TRUE) {
-      caption_set <- filter(captions, CountryCode == hero)
+      caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
       cap <- gsub(pattern = hero, replacement = name, caption_set$DestinationSkew)
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
@@ -328,17 +364,17 @@ plot_dest <- function(hero,
         space_after = FALSE
       )
     }
-    plot <- plot + labs(caption = caption_text)
+    plot <- plot + ggplot2::labs(caption = caption_text)
 
   } else {
 
     # Fallback if data is missing
 
-    plot <- ggplot() + apply_theme(type = "void", basesize)
+    plot <- ggplot2::ggplot() + apply_theme(type = "void", basesize)
     if (is.logical(title) & title == TRUE) {
-      plot <- plot + ggtitle(ids$title)
+      plot <- plot + ggplot2::ggtitle(ids$title)
     } else if (is.character(title) | is.numeric(title)) {
-      plot <- plot + ggtitle(title)
+      plot <- plot + ggplot2::ggtitle(title)
     }
     if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
@@ -352,9 +388,9 @@ plot_dest <- function(hero,
         space_after = FALSE
       )
     }
-    plot <- plot + labs(caption = caption_text)
-    plot <- ggdraw(plot) +
-      draw_label("No data", color = pal("blues", 3), size = size$text)
+    plot <- plot + ggplot2::labs(caption = caption_text)
+    plot <- cowplot::ggdraw(plot) +
+      cowplot::draw_label("No data", color = pal("blues", 3), size = size$text)
   }
 
   return(plot)
@@ -373,70 +409,81 @@ plot_orig <- function(hero,
   size <- sizer(basesize)
   max_name <- (width / basesize) * 15
   max_caption <- (width / basesize) * 55
-  k <- function(factor = 1) factor * size$text / .pt
+  k <- function(factor = 1) factor * size$text / ggplot2::.pt
   ids <- plot_ider("orig")
   name <- namer(hero, max_name)
   threshold <- 5
 
   # Data
   df1 <- stocks |>
-    filter(to == hero & sex == "Total" & t == max(t))
+    dplyr::filter(
+      .data$to == hero & .data$sex == "Total" & .data$t == max(.data$t)
+    )
 
   if (nrow(df1) > 0) {
 
     df <- df1 |>
-      filter(from != "XXX") |>
-      arrange(desc(v)) |>
-      mutate(rank = 1:n()) |>
-      bind_rows(filter(df1, from == "XXX")) |>
-      mutate(country = case_when(
-        rank > threshold ~ "Others",
-        from == "XXX" ~ "Others",
-        nchar(countryname(from)) <= maxchar ~ countryname(from),
-        .default = from
+      dplyr::filter(.data$from != "XXX") |>
+      dplyr::arrange(dplyr::desc(.data$v)) |>
+      dplyr::mutate(rank = 1:dplyr::n()) |>
+      dplyr::bind_rows(dplyr::filter(df1, .data$from == "XXX")) |>
+      dplyr::mutate(country = dplyr::case_when(
+        .data$rank > threshold ~ "Others",
+        .data$from == "XXX" ~ "Others",
+        nchar(countryname(.data$from)) <= maxchar ~ countryname(.data$from),
+        .default = .data$from
       )) |>
-      summarise(v = sum(v), .by = c(to, t, country)) |>
-      mutate(
-        v = v / sum(v),
-        country = forcats::fct_reorder(country, v),
-        country = forcats::fct_relevel(country, "Others", after = 0)
+      dplyr::summarise(
+        v = sum(.data$v),
+        .by = c(.data$to, .data$t, .data$country)
+      ) |>
+      dplyr::mutate(
+        v = .data$v / sum(.data$v),
+        country = forcats::fct_reorder(.data$country, .data$v),
+        country = forcats::fct_relevel(.data$country, "Others", after = 0)
       )
 
     if (nrow(df) > threshold) {
       df <- df |>
-        mutate(country = forcats::fct_relevel(country, "Others", after = 0))
+        dplyr::mutate(
+          country = forcats::fct_relevel(.data$country, "Others", after = 0)
+        )
     }
 
-    plot <- ggplot(df, aes(x = 100 * v, y = country)) +
-      geom_bar(stat = "identity", fill = pal("blues", 3), width = .7) +
+    plot <- ggplot2::ggplot(
+      df,
+      ggplot2::aes(x = 100 * .data$v, y = .data$country)
+    ) +
+      ggplot2::geom_bar(stat = "identity", fill = pal("blues", 3), width = .7) +
       linemarker("v") +
 
       # Annotation
-      geom_text(
-        mapping = aes(label = prettylabel(100 * v, pct = TRUE)),
+      ggplot2::geom_text(
+        mapping = ggplot2::aes(label = prettylabel(100 * .data$v, pct = TRUE)),
         size = k(), color = pal("blues"), fontface = "bold",
         hjust = 0, vjust = .5, nudge_x = 1
       ) +
 
       # Aesthetics
       apply_theme(type = "bar-horizontal", basesize) +
-      scale_x_continuous(
+      ggplot2::scale_x_continuous(
         labels = function(x) prettylabel(x, pct = TRUE),
-        expand = expansion(mult = c(.02, .15))
+        expand = ggplot2::expansion(mult = c(.02, .15))
       ) +
-      theme(plot.margin = margin(k(5), k(3.5), k(5), k(3.5)))
+      ggplot2::theme(plot.margin = ggplot2::margin(k(5), k(3.5), k(5), k(3.5)))
 
 
     # Title
     if (is.logical(title) & title == TRUE) {
-      plot <- plot + ggtitle(stringr::str_glue("{ids$title} ({df$t[1]})"))
+      plot <- plot +
+        ggplot2::ggtitle(stringr::str_glue("{ids$title} ({df$t[1]})"))
     } else if (is.character(title) | is.numeric(title)) {
-      plot <- plot + ggtitle(title)
+      plot <- plot + ggplot2::ggtitle(title)
     }
 
     # Caption
     if (is.logical(caption) & caption == TRUE) {
-      caption_set <- filter(captions, CountryCode == hero)
+      caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
       cap <- gsub(pattern = hero, replacement = name, caption_set$OriginSkew)
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
@@ -454,17 +501,17 @@ plot_orig <- function(hero,
         space_after = FALSE
       )
     }
-    plot <- plot + labs(caption = caption_text)
+    plot <- plot + ggplot2::labs(caption = caption_text)
 
   } else {
 
     # Fallback if data is missing
 
-    plot <- ggplot() + apply_theme(type = "void", basesize)
+    plot <- ggplot2::ggplot() + apply_theme(type = "void", basesize)
     if (is.logical(title) & title == TRUE) {
-      plot <- plot + ggtitle(ids$title)
+      plot <- plot + ggplot2::ggtitle(ids$title)
     } else if (is.character(title) | is.numeric(title)) {
-      plot <- plot + ggtitle(title)
+      plot <- plot + ggplot2::ggtitle(title)
     }
     if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
@@ -478,9 +525,9 @@ plot_orig <- function(hero,
         space_after = FALSE
       )
     }
-    plot <- plot + labs(caption = caption_text)
-    plot <- ggdraw(plot) +
-      draw_label("No data", color = pal("blues", 3), size = size$text)
+    plot <- plot + ggplot2::labs(caption = caption_text)
+    plot <- cowplot::ggdraw(plot) +
+      cowplot::draw_label("No data", color = pal("blues", 3), size = size$text)
   }
 
   return(plot)

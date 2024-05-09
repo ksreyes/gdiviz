@@ -14,7 +14,6 @@
 #' @param omit_zero Whether to omit zero. Useful for labeling plot axes.
 #'
 #' @return String or vector of strings.
-#' @examples
 #'
 #' @export
 prettylabel <- function(N,

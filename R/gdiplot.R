@@ -107,13 +107,13 @@ gdiplot <- function(code,
     folder <- paste0(folder, "/")
   }
   if (export == "svg") {
-    ggsave(
+    ggplot2::ggsave(
       paste0(folder, code, "_", country, ".svg"),
       device = "svg", width = width, height = height, units = "cm"
     )
   }
   if (export == "png") {
-    ggsave(
+    ggplot2::ggsave(
       paste0(folder, code, "_", country, ".png"),
       device = "png", width = width, height = height, units = "cm"
     )
