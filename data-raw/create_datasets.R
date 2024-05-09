@@ -27,7 +27,7 @@ stocks <- dplyr::bind_rows(
   dplyr::select(from = Origin, to = Destin, sex = Sex, t, v) |>
   dplyr::arrange(from, to, sex, t)
 
-usethis::use_data(stocks, overwrite = TRUE)
+# usethis::use_data(stocks, overwrite = TRUE)
 
 
 # Indicators --------------------------------------------------------------
@@ -66,7 +66,7 @@ for (i in 1:nrow(varlist)) {
 
 indicators <- dplyr::arrange(indicators, iso, var, t)
 
-usethis::use_data(indicators, overwrite = TRUE)
+# usethis::use_data(indicators, overwrite = TRUE)
 
 
 # Disasters ---------------------------------------------------------------
@@ -123,7 +123,7 @@ disasters <- dplyr::bind_rows(
   ) |>
   tidyr::drop_na()
 
-usethis::use_data(disasters, overwrite = TRUE)
+# usethis::use_data(disasters, overwrite = TRUE)
 
 
 # IDMC --------------------------------------------------------------------
@@ -143,7 +143,12 @@ idmc_nat <- readxl::read_excel("data-raw/raw/IDMC_Internal_Displacement_Conflict
   ) |>
   tidyr::replace_na(list(v = 0)) |>
   dplyr::select(iso = ISO3, category, t = Year, v) |>
-  tidyr::complete(iso, t = full_seq(t, 1), category, fill = list(v = 0)) |>
+  tidyr::complete(
+    iso,
+    t = tidyr::full_seq(t, 1),
+    category,
+    fill = list(v = 0)
+  ) |>
   dplyr::mutate(
     dataset = "national",
     t = as.integer(t),
@@ -184,7 +189,7 @@ idmc <- dplyr::bind_rows(idmc_nat, idmc_geo) |>
   dplyr::select(dataset, iso, category, type, t, longitude, latitude, v) |>
   dplyr::arrange(dataset, iso, category, type, t)
 
-usethis::use_data(idmc, overwrite = TRUE)
+# usethis::use_data(idmc, overwrite = TRUE)
 
 
 # WPP ---------------------------------------------------------------------
@@ -213,25 +218,38 @@ wpp <- readr::read_csv(
   dplyr::select(iso, t, sex, age, v) |>
   dplyr::arrange(iso, t, sex, age)
 
-usethis::use_data(wpp, overwrite = TRUE)
+# usethis::use_data(wpp, overwrite = TRUE)
 
 
 # Metadata ----------------------------------------------------------------
 
 countrynames <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "countries")
-usethis::use_data(countrynames, overwrite = TRUE)
+# usethis::use_data(countrynames, overwrite = TRUE)
 
 gdidata <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "datasets")
-usethis::use_data(gdidata, overwrite = TRUE)
+# usethis::use_data(gdidata, overwrite = TRUE)
 
 gdiplots <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "plots")
-usethis::use_data(gdiplots, overwrite = TRUE)
+# usethis::use_data(gdiplots, overwrite = TRUE)
 
 
 # Captions ----------------------------------------------------------------
 
 captions <- readr::read_csv("data-raw/Text_data.csv")
 
-usethis::use_data(captions, overwrite = TRUE)
+# usethis::use_data(captions, overwrite = TRUE)
 
 
+usethis::use_data(
+  stocks,
+  indicators,
+  disasters,
+  idmc,
+  wpp,
+  countrynames,
+  gdidata,
+  gdiplots,
+  captions,
+  internal = TRUE,
+  overwrite = TRUE
+)
