@@ -4,3 +4,6 @@
 ^\.Rproj\.user$
 ^data-raw$
 ^test$
+^_extensions$
+^_quarto\.yml$
+^\.quarto$

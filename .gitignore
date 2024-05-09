@@ -8,3 +8,8 @@ test
 data-raw/raw
 data-raw/*.xlsx
 data-raw/*.csv
+
+/.quarto/
+_extensions/
+_quarto.yml
+*.qmd
