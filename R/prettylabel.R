@@ -2,12 +2,10 @@
 #'
 #' @description
 #' Formats numbers for display in charts.
-#'  - `pretty` adds comma separators and/or a percent sign and provides control
-#'       over decimal places.
-#'  - `prettyabv`
 #'
 #' @param N Number or vector of numbers to be formatted.
 #' @param d Decimal places. Does not apply if `shorten=TRUE`.
+#' @param shorten Whether to abbreviate long numbers.
 #' @param dotzero Whether to include zeros after the decimal point.
 #' @param pct Whether to include a percent sign.
 #' @param currency Whether to add a currency sign.
@@ -93,5 +91,3 @@ prettylabel <- function(N,
 
   return(labels)
 }
-
-

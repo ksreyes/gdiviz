@@ -19,6 +19,8 @@ prettylabel(
 
 \item{d}{Decimal places. Does not apply if \code{shorten=TRUE}.}
 
+\item{shorten}{Whether to abbreviate long numbers.}
+
 \item{dotzero}{Whether to include zeros after the decimal point.}
 
 \item{pct}{Whether to include a percent sign.}
@@ -32,9 +34,4 @@ String or vector of strings.
 }
 \description{
 Formats numbers for display in charts.
-\itemize{
-\item \code{pretty} adds comma separators and/or a percent sign and provides control
-over decimal places.
-\item \code{prettyabv}
-}
 }

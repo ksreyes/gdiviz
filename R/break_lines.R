@@ -2,6 +2,8 @@
 #'
 #' @param text String to add line breaks to.
 #' @param maxchars Maximum number of characters per line.
+#' @param strip Vector of strings to remove from text when considering line
+#'   length.
 #'
 #' @export
 break_lines <- function(text, maxchars, strip = NULL) {

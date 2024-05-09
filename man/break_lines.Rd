@@ -10,6 +10,9 @@ break_lines(text, maxchars, strip = NULL)
 \item{text}{String to add line breaks to.}
 
 \item{maxchars}{Maximum number of characters per line.}
+
+\item{strip}{Vector of strings to remove from text when considering line
+length.}
 }
 \description{
 Add line breaks to string
