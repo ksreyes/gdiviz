@@ -175,7 +175,7 @@ break_lines2 <- function(text, max, bullet = FALSE, bg = "white") {
 
   collapse <- "<br>"
   if (bullet) {
-    collapse <- stringr::str_glue("<br><span style='color:{bg}'>• </span>")
+    collapse <- stringr::str_glue("<br><span style='color:{bg}'>\u00B7 </span>")
     max <- max - 2
   }
 
@@ -232,12 +232,44 @@ format_caption <- function(text, max, bullet = FALSE, bgcolor = "white") {
 
   result <- break_lines2(text, max = max, bullet = bullet, bg = bgcolor)
 
+  top10path <- system.file("images/top10.png", package = "gdiviz")
+  top33path <- system.file("images/top33.png", package = "gdiviz")
+  mid33path <- system.file("images/mid33.png", package = "gdiviz")
+  bot33path <- system.file("images/bot33.png", package = "gdiviz")
+  bot10path <- system.file("images/bot10.png", package = "gdiviz")
+
   # Insert icons
-  result <- gsub("\\(TOP10\\)", "<img src='images/top10.png' width=5>", result)
-  result <- gsub("\\(TOP33\\)", "<img src='images/top33.png' width=5>", result)
-  result <- gsub("\\(MID33\\)", "<img src='images/mid33.png' width=5>", result)
-  result <- gsub("\\(BOT33\\)", "<img src='images/bot33.png' width=5>", result)
-  result <- gsub("\\(BOT10\\)", "<img src='images/bot10.png' width=5>", result)
+  result <- gsub(
+    "\\(TOP10\\)",
+    stringr::str_glue("<img src='{top10path}' width=5>"),
+    result
+  )
+  result <- gsub(
+    "\\(TOP33\\)",
+    stringr::str_glue("<img src='{top33path}' width=5>"),
+    result
+  )
+  result <- gsub(
+    "\\(MID33\\)",
+    stringr::str_glue("<img src='{mid33path}' width=5>"),
+    result
+  )
+  result <- gsub(
+    "\\(BOT33\\)",
+    stringr::str_glue("<img src='{bot33path}' width=5>"),
+    result
+  )
+  result <- gsub(
+    "\\(BOT10\\)",
+    stringr::str_glue("<img src='{bot10path}' width=5>"),
+    result
+  )
+
+  # result <- gsub("\\(TOP10\\)", "<img src='images/top10.png' width=5>", result)
+  # result <- gsub("\\(TOP33\\)", "<img src='images/top33.png' width=5>", result)
+  # result <- gsub("\\(MID33\\)", "<img src='images/mid33.png' width=5>", result)
+  # result <- gsub("\\(BOT33\\)", "<img src='images/bot33.png' width=5>", result)
+  # result <- gsub("\\(BOT10\\)", "<img src='images/bot10.png' width=5>", result)
 
   return(result)
 }
