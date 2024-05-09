@@ -7,3 +7,4 @@
 ^_extensions$
 ^_quarto\.yml$
 ^\.quarto$
+^LICENSE\.md$
