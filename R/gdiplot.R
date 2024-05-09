@@ -6,16 +6,15 @@
 #' @param basesize Base font size.
 #' @param title Set to `TRUE` to include default plot title or input a string
 #'   for a custom title. Set to `FALSE` or `NULL` for no title.
-#' @param caption Set to `TRUE` to include default plot caption or input a string
-#'   for a custom caption. Set to `FALSE` or `NULL` for no caption.
+#' @param caption Set to `TRUE` to include default plot caption or input a
+#'   string for a custom caption. Set to `FALSE` or `NULL` for no caption.
 #' @param export Set to either "svg" or "png" to export plot in those formats.
-#' @param folder
-#' @param width
-#' @param height
-#' @param units
+#' @param folder Export destination. Leave as `NULL` to export to current
+#'   directory.
+#' @param width Exported plot width in cm. Leave as `NULL` for default width.
+#' @param height Exported plot height in cm. Leave as `NULL` for default height.
 #'
-#' @return
-#' @examples
+#' @return A ggplot object.
 #'
 #' @export
 gdiplot <- function(code,
