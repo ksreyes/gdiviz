@@ -123,7 +123,7 @@ span <- function(data) c(min(data$t), max(data$t)) |> as.numeric()
 
 range <- function(data, collapse = "-") stringr::str_flatten(span(data), collapse)
 
-plot_label <- function(plot, label, span = 2, h = .06) {
+plot_label <- function(plot, label, basesize = basesize, span = 2, h = .06) {
 
   box <- grid::rectGrob(gp = grid::gpar(fill = pal("blues", 4), col = NA))
 
@@ -143,7 +143,7 @@ plot_label <- function(plot, label, span = 2, h = .06) {
       label,
       x = width / 2, y = 1 - height / 2,
       hjust = .5, vjust = .5,
-      size = size$text, fontface = "bold", color = "white"
+      size = basesize, fontface = "bold", color = "white"
     )
 }
 
