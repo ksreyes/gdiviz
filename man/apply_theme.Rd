@@ -4,7 +4,7 @@
 \alias{apply_theme}
 \title{Apply IOM theme to a plot}
 \usage{
-apply_theme(type, basesize = 10, facets = FALSE)
+apply_theme(type, basesize = 8, facets = FALSE)
 }
 \arguments{
 \item{type}{What type of plot is being themed? Accepts "line",

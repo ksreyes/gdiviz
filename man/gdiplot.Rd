@@ -26,12 +26,20 @@ gdiplot(
 \item{title}{Set to \code{TRUE} to include default plot title or input a string
 for a custom title. Set to \code{FALSE} or \code{NULL} for no title.}
 
-\item{caption}{Set to \code{TRUE} to include default plot caption or input a string
-for a custom caption. Set to \code{FALSE} or \code{NULL} for no caption.}
+\item{caption}{Set to \code{TRUE} to include default plot caption or input a
+string for a custom caption. Set to \code{FALSE} or \code{NULL} for no caption.}
 
 \item{export}{Set to either "svg" or "png" to export plot in those formats.}
 
-\item{units}{}
+\item{folder}{Export destination. Leave as \code{NULL} to export to current
+directory.}
+
+\item{width}{Exported plot width in cm. Leave as \code{NULL} for default width.}
+
+\item{height}{Exported plot height in cm. Leave as \code{NULL} for default height.}
+}
+\value{
+A ggplot object.
 }
 \description{
 Generate a plot
