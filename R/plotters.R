@@ -88,9 +88,9 @@ plot_stocks <- function(hero,
       )
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        "• ",
+        "\u00B7 ",
         format_caption(cap1, max = max_caption, bullet = TRUE),
-        "<br>", "• ",
+        "<br>", "\u00B7 ",
         format_caption(cap2, max = max_caption, bullet = TRUE)
       )
     } else if (is.character(caption) | is.numeric(caption)) {
@@ -105,6 +105,7 @@ plot_stocks <- function(hero,
         space_after = FALSE
       )
     }
+    plot <- plot + ggplot2::labs(caption = caption_text)
 
   } else {
 
