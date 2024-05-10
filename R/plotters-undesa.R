@@ -220,8 +220,8 @@ plot_srat <- function(hero,
     }
 
     # Caption
-    if (is.logical(caption) & caption == TRUE) {
-      caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
+    caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
+    if (is.logical(caption) & caption == TRUE & nrow(caption_set) > 0) {
       cap <- gsub(pattern = hero, replacement = name, caption_set$Sex)
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
@@ -292,30 +292,29 @@ plot_dest <- function(hero,
   # Data
   df <- stocks |>
     dplyr::filter(
-      .data$from == hero &
-        .data$sex == "Total" &
-        .data$t == max(.data$t)
-    ) |>
-    dplyr::arrange(dplyr::desc(.data$v)) |>
-    dplyr::mutate(
-      rank = 1:dplyr::n(),
-      country = dplyr::case_when(
-        .data$rank > threshold ~ "Others",
-        nchar(countryname(.data$to)) <= max_name ~ countryname(.data$to),
-        .default = .data$to
-      )
-    ) |>
-    dplyr::summarise(
-      v = sum(.data$v),
-      .by = c(.data$from, .data$t, .data$country)
-    ) |>
-    dplyr::mutate(
-      v = .data$v / sum(.data$v),
-      country = forcats::fct_reorder(.data$country, .data$v),
-      country = forcats::fct_relevel(.data$country, "Others", after = 0)
+      .data$from == hero & .data$sex == "Total" & .data$t == max(.data$t)
     )
 
   if (nrow(df) > 0) {
+
+    df <- df |>
+      dplyr::arrange(dplyr::desc(.data$v)) |>
+      dplyr::mutate(
+        rank = 1:dplyr::n(),
+        country = dplyr::case_when(
+          .data$rank > threshold ~ "Others",
+          nchar(countryname(.data$to)) <= max_name ~ countryname(.data$to),
+          .default = .data$to
+        )) |>
+      dplyr::summarise(
+        v = sum(.data$v),
+        .by = c(.data$from, .data$t, .data$country)
+      ) |>
+      dplyr::mutate(
+        v = .data$v / sum(.data$v),
+        country = forcats::fct_reorder(.data$country, .data$v),
+        country = forcats::fct_relevel(.data$country, "Others", after = 0)
+      )
 
     plot <- ggplot2::ggplot(
       df,
@@ -346,8 +345,8 @@ plot_dest <- function(hero,
     }
 
     # Caption
-    if (is.logical(caption) & caption == TRUE) {
-      caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
+    caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
+    if (is.logical(caption) & caption == TRUE & nrow(caption_set) > 0) {
       cap <- gsub(pattern = hero, replacement = name, caption_set$DestinationSkew)
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
@@ -431,7 +430,7 @@ plot_orig <- function(hero,
       dplyr::mutate(country = dplyr::case_when(
         .data$rank > threshold ~ "Others",
         .data$from == "XXX" ~ "Others",
-        nchar(countryname(.data$from)) <= maxchar ~ countryname(.data$from),
+        nchar(countryname(.data$from)) <= max_name ~ countryname(.data$from),
         .default = .data$from
       )) |>
       dplyr::summarise(
@@ -483,8 +482,8 @@ plot_orig <- function(hero,
     }
 
     # Caption
-    if (is.logical(caption) & caption == TRUE) {
-      caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
+    caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
+    if (is.logical(caption) & caption == TRUE & nrow(caption_set) > 0) {
       cap <- gsub(pattern = hero, replacement = name, caption_set$OriginSkew)
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
