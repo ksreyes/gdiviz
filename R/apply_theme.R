@@ -93,10 +93,6 @@ apply_theme <- function(type, basesize = 8, facets = FALSE) {
   if (type == "bar-horizontal") {
 
     theme_barh <- list(
-      ggplot2::scale_x_continuous(
-        labels = prettylabel,
-        expand = ggplot2::expansion(mult = c(.02, .1))
-      ),
       ggplot2::theme(
         legend.key.size = bar_key_size,
         panel.grid.major.x = ggplot2::element_line(
@@ -111,10 +107,6 @@ apply_theme <- function(type, basesize = 8, facets = FALSE) {
   if (type == "bar-vertical") {
 
     theme_barv <- list(
-      ggplot2::scale_y_continuous(
-        labels = prettylabel,
-        expand = ggplot2::expansion(mult = c(.02, .1))
-      ),
       ggplot2::theme(
         legend.key.size = bar_key_size,
         panel.grid.major.x = ggplot2::element_blank(),
@@ -129,7 +121,6 @@ apply_theme <- function(type, basesize = 8, facets = FALSE) {
   if (type == "line") {
 
     theme_line <- list(
-      ggplot2::scale_y_continuous(labels = pretty),
       ggplot2::theme(
         legend.key.height = line_key_height,
         legend.key.width = line_key_width,
@@ -140,24 +131,6 @@ apply_theme <- function(type, basesize = 8, facets = FALSE) {
         ),
       ))
     theme <- c(base, theme_line)
-  }
-
-  if (type == "line-pct") {
-
-    theme_linepct <- list(
-      ggplot2::scale_y_continuous(
-        labels = function(x) prettylabel(x, pct = TRUE)
-      ),
-      ggplot2::theme(
-        legend.key.height = line_key_height,
-        legend.key.width = line_key_width,
-        panel.grid.major.x = ggplot2::element_blank(),
-        panel.grid.major.y = ggplot2::element_line(
-          linewidth = panel_grid_width,
-          color = panel_grid_color
-        ),
-      ))
-    theme <- c(base, theme_linepct)
   }
 
   if (type == "map") {
