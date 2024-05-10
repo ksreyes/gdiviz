@@ -10,6 +10,16 @@ pivot_years <- function(data) {
   )
 }
 
+# Metadata ----------------------------------------------------------------
+
+countrynames <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "countries")
+usethis::use_data(countrynames, overwrite = TRUE)
+
+gdidata <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "datasets")
+usethis::use_data(gdidata, overwrite = TRUE)
+
+gdiplots <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "plots")
+usethis::use_data(gdiplots, overwrite = TRUE)
 
 # Stocks ------------------------------------------------------------------
 
@@ -221,21 +231,10 @@ wpp <- readr::read_csv(
 # usethis::use_data(wpp, overwrite = TRUE)
 
 
-# Metadata ----------------------------------------------------------------
-
-countrynames <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "countries")
-# usethis::use_data(countrynames, overwrite = TRUE)
-
-gdidata <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "datasets")
-# usethis::use_data(gdidata, overwrite = TRUE)
-
-gdiplots <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "plots")
-# usethis::use_data(gdiplots, overwrite = TRUE)
-
 
 # Captions ----------------------------------------------------------------
 
-captions <- readr::read_csv("data-raw/Text_data.csv")
+captions <- readr::read_csv("data-raw/captions.csv")
 
 # usethis::use_data(captions, overwrite = TRUE)
 
@@ -246,9 +245,6 @@ usethis::use_data(
   disasters,
   idmc,
   wpp,
-  countrynames,
-  gdidata,
-  gdiplots,
   captions,
   internal = TRUE,
   overwrite = TRUE

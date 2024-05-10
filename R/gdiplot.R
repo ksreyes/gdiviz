@@ -1,7 +1,7 @@
 
 #' Generate a plot
 #'
-#' @param code The plot code. Run `gdiplots` for available options.
+#' @param code The plot code. See `gdiplots` for available options.
 #' @param country The 3-letter ISO country code.
 #' @param basesize Base font size.
 #' @param title Set to `TRUE` to include default plot title or input a string
@@ -99,6 +99,59 @@ gdiplot <- function(code,
     )
   }
 
+  if (code == "nmig") {
+
+    if (is.null(width)) width <- 12
+    if (is.null(height)) {
+      if (caption == TRUE | is.character(caption)) height <- 8 * 1.25
+      else height <- 8
+    }
+
+    plot <- plot_nmig(
+      hero = country,
+      basesize = basesize,
+      title = title,
+      caption = caption,
+      width = width,
+      height = height
+    )
+  }
+
+  if (code == "remt") {
+
+    if (is.null(width)) width <- 12
+    if (is.null(height)) {
+      if (caption == TRUE | is.character(caption)) height <- 8 * 1.25
+      else height <- 8
+    }
+
+    plot <- plot_remt(
+      hero = country,
+      basesize = basesize,
+      title = title,
+      caption = caption,
+      width = width,
+      height = height
+    )
+  }
+
+  if (code == "fdi") {
+
+    if (is.null(width)) width <- 12
+    if (is.null(height)) {
+      if (caption == TRUE | is.character(caption)) height <- 8 * 1.25
+      else height <- 8
+    }
+
+    plot <- plot_fdi(
+      hero = country,
+      basesize = basesize,
+      title = title,
+      caption = caption,
+      width = width,
+      height = height
+    )
+  }
 
   # Export ----------------------------------------------------------------
 
@@ -119,5 +172,5 @@ gdiplot <- function(code,
     )
   }
 
-  return(plot)
+  return(suppressMessages(plot))
 }
