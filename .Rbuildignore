@@ -8,3 +8,4 @@
 ^_quarto\.yml$
 ^\.quarto$
 ^LICENSE\.md$
+^README\.Rmd$
