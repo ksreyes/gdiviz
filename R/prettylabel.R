@@ -43,7 +43,7 @@ prettylabel <- function(N,
         new_magnitude <- abs(m) |> log10() |> floor()
 
         # If m is single digit, add decimal
-        if (new_magnitude <= 0) {
+        if (n != 0 & new_magnitude <= 0) {
           paste0(
             currency,
             format(m, digits = 1, nsmall = nsmall),
@@ -60,9 +60,9 @@ prettylabel <- function(N,
 
       label <- dplyr::case_when(
         magnitude >= 12 & magnitude < 15 ~ labeler(n, magnitude, 10^12, "T"),
-        magnitude >= 9  & magnitude < 12 ~ labeler(n, magnitude, 10^9, "B"),
-        magnitude >= 6  & magnitude < 9  ~ labeler(n, magnitude, 10^6, "M"),
-        magnitude >= 3  & magnitude < 6  ~ labeler(n, magnitude, 10^3, "K"),
+        magnitude >= 9  & magnitude < 12 ~ labeler(n, magnitude, 10^9,  "B"),
+        magnitude >= 6  & magnitude < 9  ~ labeler(n, magnitude, 10^6,  "M"),
+        magnitude >= 3  & magnitude < 6  ~ labeler(n, magnitude, 10^3,  "K"),
         magnitude < 3                    ~ labeler(n, magnitude),
         .default = "0"
       )
@@ -80,7 +80,6 @@ prettylabel <- function(N,
           format(n, digits = d, big.mark = ",", nsmall = nsmall)
         )
       }
-
     }
 
     if (pct) label <- paste0(label, "%")
