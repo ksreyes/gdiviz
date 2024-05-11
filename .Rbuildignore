@@ -9,3 +9,6 @@
 ^\.quarto$
 ^LICENSE\.md$
 ^README\.Rmd$
+^test\.R$
+^notes\.R$
+^R/notes\.R$
