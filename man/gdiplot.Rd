@@ -17,7 +17,7 @@ gdiplot(
 )
 }
 \arguments{
-\item{code}{The plot code. Run \code{gdiplots} for available options.}
+\item{code}{The plot code. See \code{gdiplots} for available options.}
 
 \item{country}{The 3-letter ISO country code.}
 

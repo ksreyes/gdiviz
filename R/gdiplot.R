@@ -153,6 +153,60 @@ gdiplot <- function(code,
     )
   }
 
+  if (code == "pop") {
+
+    if (is.null(width)) width <- 12
+    if (is.null(height)) {
+      if (caption == TRUE | is.character(caption)) height <- 8 * 1.25
+      else height <- 8
+    }
+
+    plot <- plot_pop(
+      hero = country,
+      basesize = basesize,
+      title = title,
+      caption = caption,
+      width = width,
+      height = height
+    )
+  }
+
+  if (code == "birth") {
+
+    if (is.null(width)) width <- 12
+    if (is.null(height)) {
+      if (caption == TRUE | is.character(caption)) height <- 8 * 1.25
+      else height <- 8
+    }
+
+    plot <- plot_birth(
+      hero = country,
+      basesize = basesize,
+      title = title,
+      caption = caption,
+      width = width,
+      height = height
+    )
+  }
+
+  if (code == "depend") {
+
+    if (is.null(width)) width <- 12
+    if (is.null(height)) {
+      if (caption == TRUE | is.character(caption)) height <- 8 * 1.25
+      else height <- 8
+    }
+
+    plot <- plot_depend(
+      hero = country,
+      basesize = basesize,
+      title = title,
+      caption = caption,
+      width = width,
+      height = height
+    )
+  }
+
   # Export ----------------------------------------------------------------
 
   if (!is.null(folder)) {
