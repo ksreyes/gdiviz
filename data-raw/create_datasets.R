@@ -26,15 +26,15 @@ usethis::use_data(gdiplots, overwrite = TRUE)
 stocks <- dplyr::bind_rows(
   readr::read_csv("data-raw/raw/Stocks_total.csv") |>
     pivot_years() |>
-    dplyr::mutate(Sex = "Total"),
+    dplyr::mutate(sex = "Total"),
   readr::read_csv("data-raw/raw/Stocks_female.csv") |>
     pivot_years() |>
-    dplyr::mutate(Sex = "Female"),
+    dplyr::mutate(sex = "Female"),
   readr::read_csv("data-raw/raw/Stocks_male.csv") |>
     pivot_years() |>
-    dplyr::mutate(Sex = "Male")
+    dplyr::mutate(sex = "Male")
 ) |>
-  dplyr::select(from = Origin, to = Destin, sex = Sex, t, v) |>
+  dplyr::select(from = orig, to = dest, sex, t, v) |>
   dplyr::arrange(from, to, sex, t)
 
 # usethis::use_data(stocks, overwrite = TRUE)
