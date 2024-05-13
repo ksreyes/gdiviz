@@ -207,6 +207,60 @@ gdiplot <- function(code,
     )
   }
 
+  if (code == "popmap") {
+
+    if (is.null(width)) width <- 12
+    if (is.null(height)) {
+      if (caption == TRUE | is.character(caption)) height <- 12 * 1.25
+      else height <- 12
+    }
+
+    plot <- plot_popmap(
+      hero = country,
+      basesize = basesize,
+      title = title,
+      caption = caption,
+      width = width,
+      height = height
+    )
+  }
+
+  if (code == "incmap") {
+
+    if (is.null(width)) width <- 12
+    if (is.null(height)) {
+      if (caption == TRUE | is.character(caption)) height <- 12 * 1.25
+      else height <- 12
+    }
+
+    plot <- plot_incmap(
+      hero = country,
+      basesize = basesize,
+      title = title,
+      caption = caption,
+      width = width,
+      height = height
+    )
+  }
+
+  if (code == "nmigmap") {
+
+    if (is.null(width)) width <- 12
+    if (is.null(height)) {
+      if (caption == TRUE | is.character(caption)) height <- 12 * 1.25
+      else height <- 12
+    }
+
+    plot <- plot_nmigmap(
+      hero = country,
+      basesize = basesize,
+      title = title,
+      caption = caption,
+      width = width,
+      height = height
+    )
+  }
+
   # Export ----------------------------------------------------------------
 
   if (!is.null(folder)) {
