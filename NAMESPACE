@@ -2,8 +2,11 @@
 
 export(apply_theme)
 export(break_lines)
+export(countryname)
+export(format_source)
 export(gdiplot)
 export(linemarker)
 export(pal)
 export(prettylabel)
+export(sizer)
 importFrom(rlang,.data)

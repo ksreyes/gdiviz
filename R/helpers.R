@@ -1,27 +1,7 @@
 
-
-countryname <- function(key, from = "iso3c", to = "unname") {
-  out <- c()
-  for (k in key) {
-    hit <- countrynames[{to}][countrynames[{from}] == toupper(k)]
-    if (length(hit) == 0) out <- c(out, NA)
-    else out <- c(out, hit)
-  }
-  return(out)
-}
-
-sizer <- function(basesize) {
-  list(
-    text = basesize,
-    title = basesize + 2,
-    stext = basesize - 1,
-    footnote = basesize - 2
-  )
-}
-
-namer <- function(hero, max_name) {
+namer <- function(hero, maxchar) {
   ifelse(
-    nchar(countryname(hero)) <= max_name,
+    nchar(countryname(hero)) <= maxchar,
     countryname(hero),
     hero
   )
@@ -94,24 +74,6 @@ add_labels <- function(df,
   }
 
   return(labels)
-}
-
-format_source <- function(source, basesize, space_after = TRUE) {
-
-  size <- list(
-    text = basesize,
-    title = basesize + 2,
-    stext = basesize - 1,
-    footnote = basesize - 2
-  )
-
-  size <- size$footnote
-  color <- pal("blues", 3)
-  style <- stringr::str_glue("font-size:{size}pt; color:{color}")
-
-  spaces <- ifelse(space_after, "<br><br>", "")
-
-  stringr::str_glue("<span style='{style}'><i>Source: {source}.</i>{spaces}</span>")
 }
 
 span <- function(data) c(min(data$t), max(data$t)) |> as.numeric()
