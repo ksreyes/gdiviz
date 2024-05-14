@@ -22,6 +22,7 @@ gdiplot <- function(code,
                     basesize = 8,
                     title = TRUE,
                     caption = FALSE,
+                    caption_maxchar = NULL,
                     export = "none",
                     folder = NULL,
                     width = NULL,
@@ -40,6 +41,7 @@ gdiplot <- function(code,
       basesize = basesize,
       title = title,
       caption = caption,
+      caption_maxchar = caption_maxchar,
       width = width,
       height = height
     )
@@ -58,6 +60,7 @@ gdiplot <- function(code,
       basesize = basesize,
       title = title,
       caption = caption,
+      caption_maxchar = caption_maxchar,
       width = width,
       height = height
     )
@@ -76,6 +79,7 @@ gdiplot <- function(code,
       basesize = basesize,
       title = title,
       caption = caption,
+      caption_maxchar = caption_maxchar,
       width = width,
       height = height
     )
@@ -94,6 +98,7 @@ gdiplot <- function(code,
       basesize = basesize,
       title = title,
       caption = caption,
+      caption_maxchar = caption_maxchar,
       width = width,
       height = height
     )
@@ -112,6 +117,7 @@ gdiplot <- function(code,
       basesize = basesize,
       title = title,
       caption = caption,
+      caption_maxchar = caption_maxchar,
       width = width,
       height = height
     )
@@ -130,6 +136,7 @@ gdiplot <- function(code,
       basesize = basesize,
       title = title,
       caption = caption,
+      caption_maxchar = caption_maxchar,
       width = width,
       height = height
     )
@@ -148,6 +155,7 @@ gdiplot <- function(code,
       basesize = basesize,
       title = title,
       caption = caption,
+      caption_maxchar = caption_maxchar,
       width = width,
       height = height
     )
@@ -166,6 +174,7 @@ gdiplot <- function(code,
       basesize = basesize,
       title = title,
       caption = caption,
+      caption_maxchar = caption_maxchar,
       width = width,
       height = height
     )
@@ -184,6 +193,7 @@ gdiplot <- function(code,
       basesize = basesize,
       title = title,
       caption = caption,
+      caption_maxchar = caption_maxchar,
       width = width,
       height = height
     )
@@ -202,6 +212,7 @@ gdiplot <- function(code,
       basesize = basesize,
       title = title,
       caption = caption,
+      caption_maxchar = caption_maxchar,
       width = width,
       height = height
     )
@@ -220,6 +231,7 @@ gdiplot <- function(code,
       basesize = basesize,
       title = title,
       caption = caption,
+      caption_maxchar = caption_maxchar,
       width = width,
       height = height
     )
@@ -238,6 +250,7 @@ gdiplot <- function(code,
       basesize = basesize,
       title = title,
       caption = caption,
+      caption_maxchar = caption_maxchar,
       width = width,
       height = height
     )
@@ -256,6 +269,7 @@ gdiplot <- function(code,
       basesize = basesize,
       title = title,
       caption = caption,
+      caption_maxchar = caption_maxchar,
       width = width,
       height = height
     )

@@ -5,16 +5,17 @@ plot_nmigmap <- function(hero,
                          basesize = 8,
                          title = TRUE,
                          caption = FALSE,
+                         caption_maxchar = NULL,
                          width = 12,
                          height = 12) {
 
   # Parameters
   size <- sizer(basesize)
-  max_name <- (width / basesize) * 15
-  max_caption <- (width / basesize) * 55
+  name_maxchar <- (width / basesize) * 15
+  caption_maxchar <- (width / basesize) * 55
   k <- function(factor = 1) factor * size$text / ggplot2::.pt
   ids <- plot_ider("nmigmap")
-  name <- namer(hero, max_name)
+  name <- namer(hero, name_maxchar)
 
   # Data
   border <- rnaturalearth::ne_countries(scale = 50) |>
@@ -113,7 +114,7 @@ plot_nmigmap <- function(hero,
   if (is.character(caption) | is.numeric(caption)) {
     caption_text <- paste0(
       format_source(ids$source, basesize = basesize),
-      format_caption(caption, max = max_caption)
+      format_caption(caption, max = caption_maxchar)
     )
   } else {
     caption_text <- format_source(
@@ -143,16 +144,17 @@ plot_popmap <- function(hero,
                         basesize = 8,
                         title = TRUE,
                         caption = FALSE,
+                        caption_maxchar = NULL,
                         width = 12,
                         height = 12) {
 
   # Parameters
   size <- sizer(basesize)
-  max_name <- (width / basesize) * 15
-  max_caption <- (width / basesize) * 55
+  name_maxchar <- (width / basesize) * 15
+  caption_maxchar <- (width / basesize) * 55
   k <- function(factor = 1) factor * size$text / ggplot2::.pt
   ids <- plot_ider("popmap")
-  name <- namer(hero, max_name)
+  name <- namer(hero, name_maxchar)
 
   # Data
   border <- rnaturalearth::ne_countries(scale = 50) |>
@@ -242,7 +244,7 @@ plot_popmap <- function(hero,
   if (is.character(caption) | is.numeric(caption)) {
     caption_text <- paste0(
       format_source(ids$source, basesize = basesize),
-      format_caption(caption, max = max_caption)
+      format_caption(caption, max = caption_maxchar)
     )
   } else {
     caption_text <- format_source(
@@ -272,16 +274,17 @@ plot_incmap <- function(hero,
                         basesize = 8,
                         title = TRUE,
                         caption = FALSE,
+                        caption_maxchar = NULL,
                         width = 12,
                         height = 12) {
 
   # Parameters
   size <- sizer(basesize)
-  max_name <- (width / basesize) * 15
-  max_caption <- (width / basesize) * 55
+  name_maxchar <- (width / basesize) * 15
+  caption_maxchar <- (width / basesize) * 55
   k <- function(factor = 1) factor * size$text / ggplot2::.pt
   ids <- plot_ider("incmap")
-  name <- namer(hero, max_name)
+  name <- namer(hero, name_maxchar)
 
   # Data
   border <- rnaturalearth::ne_countries(scale = 50) |>
@@ -377,7 +380,7 @@ plot_incmap <- function(hero,
   if (is.character(caption) | is.numeric(caption)) {
     caption_text <- paste0(
       format_source(ids$source, basesize = basesize),
-      format_caption(caption, max = max_caption)
+      format_caption(caption, max = caption_maxchar)
     )
   } else {
     caption_text <- format_source(

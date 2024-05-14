@@ -11,16 +11,17 @@ plot_nmig <- function(hero,
                       basesize = 8,
                       title = TRUE,
                       caption = FALSE,
+                      caption_maxchar = NULL,
                       width = 12,
                       height = 8) {
 
   # Parameters
   size <- sizer(basesize)
-  max_name <- (width / basesize) * 15
-  max_caption <- (width / basesize) * 55
+  name_maxchar <- (width / basesize) * 15
+  caption_maxchar <- (width / basesize) * 55
   k <- function(factor = 1) factor * size$text / ggplot2::.pt
   ids <- plot_ider("nmig")
-  name <- namer(hero, max_name)
+  name <- namer(hero, name_maxchar)
 
   # Data
   df <- dplyr::left_join(
@@ -76,12 +77,12 @@ plot_nmig <- function(hero,
       cap <- gsub(pattern = hero, replacement = name, caption_set$Netmigration)
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(cap, max = max_caption)
+        format_caption(cap, max = caption_maxchar)
       )
     } else if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(caption, max = max_caption)
+        format_caption(caption, max = caption_maxchar)
       )
     } else {
       caption_text <- format_source(
@@ -105,7 +106,7 @@ plot_nmig <- function(hero,
     if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(caption, max = max_caption)
+        format_caption(caption, max = caption_maxchar)
       )
     } else {
       caption_text <- format_source(
@@ -128,16 +129,17 @@ plot_remt <- function(hero,
                       basesize = 8,
                       title = TRUE,
                       caption = FALSE,
+                      caption_maxchar = NULL,
                       width = 12,
                       height = 8) {
 
   # Parameters
   size <- sizer(basesize)
-  max_name <- (width / basesize) * 15
-  max_caption <- (width / basesize) * 55
+  name_maxchar <- (width / basesize) * 15
+  caption_maxchar <- (width / basesize) * 55
   k <- function(factor = 1) factor * size$text / ggplot2::.pt
   ids <- plot_ider("remt")
-  name <- namer(hero, max_name)
+  name <- namer(hero, name_maxchar)
 
   # Data
   df <- dplyr::filter(
@@ -192,12 +194,12 @@ plot_remt <- function(hero,
       cap <- gsub(pattern = hero, replacement = name, caption_set$Remittances)
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(cap, max = max_caption)
+        format_caption(cap, max = caption_maxchar)
       )
     } else if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(caption, max = max_caption)
+        format_caption(caption, max = caption_maxchar)
       )
     } else {
       caption_text <- format_source(
@@ -221,7 +223,7 @@ plot_remt <- function(hero,
     if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(caption, max = max_caption)
+        format_caption(caption, max = caption_maxchar)
       )
     } else {
       caption_text <- format_source(
@@ -244,16 +246,17 @@ plot_fdi <- function(hero,
                      basesize = 8,
                      title = TRUE,
                      caption = FALSE,
+                     caption_maxchar = NULL,
                      width = 12,
                      height = 8) {
 
   # Parameters
   size <- sizer(basesize)
-  max_name <- (width / basesize) * 15
-  max_caption <- (width / basesize) * 55
+  name_maxchar <- (width / basesize) * 15
+  caption_maxchar <- (width / basesize) * 55
   k <- function(factor = 1) factor * size$text / ggplot2::.pt
   ids <- plot_ider("fdi")
-  name <- namer(hero, max_name)
+  name <- namer(hero, name_maxchar)
 
   # Data
   df <- dplyr::filter(
@@ -308,12 +311,12 @@ plot_fdi <- function(hero,
       cap <- gsub(pattern = hero, replacement = name, caption_set$`Foreign direct investments`)
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(cap, max = max_caption)
+        format_caption(cap, max = caption_maxchar)
       )
     } else if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(caption, max = max_caption)
+        format_caption(caption, max = caption_maxchar)
       )
     } else {
       caption_text <- format_source(
@@ -337,7 +340,7 @@ plot_fdi <- function(hero,
     if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(caption, max = max_caption)
+        format_caption(caption, max = caption_maxchar)
       )
     } else {
       caption_text <- format_source(
@@ -360,16 +363,17 @@ plot_pop <- function(hero,
                      basesize = 8,
                      title = TRUE,
                      caption = FALSE,
+                     caption_maxchar = NULL,
                      width = 12,
                      height = 8) {
 
   # Parameters
   size <- sizer(basesize)
-  max_name <- (width / basesize) * 15
-  max_caption <- (width / basesize) * 55
+  name_maxchar <- (width / basesize) * 15
+  caption_maxchar <- (width / basesize) * 55
   k <- function(factor = 1) factor * size$text / ggplot2::.pt
   ids <- plot_ider("pop")
-  name <- namer(hero, max_name)
+  name <- namer(hero, name_maxchar)
 
   # Data
   table <- dplyr::filter(indicators, .data$var == "pop")
@@ -430,12 +434,12 @@ plot_pop <- function(hero,
       cap <- gsub(pattern = hero, replacement = name, caption_set$Population)
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(cap, max = max_caption)
+        format_caption(cap, max = caption_maxchar)
       )
     } else if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(caption, max = max_caption)
+        format_caption(caption, max = caption_maxchar)
       )
     } else {
       caption_text <- format_source(
@@ -459,7 +463,7 @@ plot_pop <- function(hero,
     if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(caption, max = max_caption)
+        format_caption(caption, max = caption_maxchar)
       )
     } else {
       caption_text <- format_source(
@@ -482,16 +486,17 @@ plot_birth <- function(hero,
                        basesize = 8,
                        title = TRUE,
                        caption = FALSE,
+                       caption_maxchar = NULL,
                        width = 12,
                        height = 8) {
 
   # Parameters
   size <- sizer(basesize)
-  max_name <- (width / basesize) * 15
-  max_caption <- (width / basesize) * 55
+  name_maxchar <- (width / basesize) * 15
+  caption_maxchar <- (width / basesize) * 55
   k <- function(factor = 1) factor * size$text / ggplot2::.pt
   ids <- plot_ider("birth")
-  name <- namer(hero, max_name)
+  name <- namer(hero, name_maxchar)
 
   # Data
   table <- dplyr::filter(indicators, .data$var == "birth")
@@ -555,12 +560,12 @@ plot_birth <- function(hero,
       cap <- gsub(pattern = hero, replacement = name, caption_set$BirthRate)
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(cap, max = max_caption)
+        format_caption(cap, max = caption_maxchar)
       )
     } else if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(caption, max = max_caption)
+        format_caption(caption, max = caption_maxchar)
       )
     } else {
       caption_text <- format_source(
@@ -584,7 +589,7 @@ plot_birth <- function(hero,
     if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(caption, max = max_caption)
+        format_caption(caption, max = caption_maxchar)
       )
     } else {
       caption_text <- format_source(
@@ -607,16 +612,17 @@ plot_depend <- function(hero,
                         basesize = 8,
                         title = TRUE,
                         caption = FALSE,
+                        caption_maxchar = NULL,
                         width = 12,
                         height = 8) {
 
   # Parameters
   size <- sizer(basesize)
-  max_name <- (width / basesize) * 15
-  max_caption <- (width / basesize) * 55
+  name_maxchar <- (width / basesize) * 15
+  caption_maxchar <- (width / basesize) * 55
   k <- function(factor = 1) factor * size$text / ggplot2::.pt
   ids <- plot_ider("depend")
-  name <- namer(hero, max_name)
+  name <- namer(hero, name_maxchar)
 
   # Data
   table <- dplyr::filter(indicators, .data$var == "depd")
@@ -680,12 +686,12 @@ plot_depend <- function(hero,
       cap <- gsub(pattern = hero, replacement = name, caption_set$AgeDependency)
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(cap, max = max_caption)
+        format_caption(cap, max = caption_maxchar)
       )
     } else if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(caption, max = max_caption)
+        format_caption(caption, max = caption_maxchar)
       )
     } else {
       caption_text <- format_source(
@@ -709,7 +715,7 @@ plot_depend <- function(hero,
     if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(caption, max = max_caption)
+        format_caption(caption, max = caption_maxchar)
       )
     } else {
       caption_text <- format_source(
