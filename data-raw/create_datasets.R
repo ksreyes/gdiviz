@@ -157,12 +157,6 @@ idmc_nat <- readxl::read_excel(stringr::str_glue("data-raw/raw/{idmc1}")) |>
   ) |>
   tidyr::replace_na(list(v = 0)) |>
   dplyr::select(iso = ISO3, category, t = Year, v) |>
-  tidyr::complete(
-    iso,
-    t = tidyr::full_seq(t, 1),
-    category,
-    fill = list(v = 0)
-  ) |>
   dplyr::mutate(
     dataset = "national",
     t = as.integer(t),
