@@ -10,6 +10,7 @@ gdiplot(
   basesize = 8,
   title = TRUE,
   caption = FALSE,
+  caption_maxchar = NULL,
   export = "none",
   folder = NULL,
   width = NULL,
@@ -28,6 +29,8 @@ for a custom title. Set to \code{FALSE} or \code{NULL} for no title.}
 
 \item{caption}{Set to \code{TRUE} to include default plot caption or input a
 string for a custom caption. Set to \code{FALSE} or \code{NULL} for no caption.}
+
+\item{caption_maxchar}{Manually set maximum characters for lines in captions.}
 
 \item{export}{Set to either "svg" or "png" to export plot in those formats.}
 

@@ -8,6 +8,7 @@
 #'   for a custom title. Set to `FALSE` or `NULL` for no title.
 #' @param caption Set to `TRUE` to include default plot caption or input a
 #'   string for a custom caption. Set to `FALSE` or `NULL` for no caption.
+#' @param caption_maxchar Manually set maximum characters for lines in captions.
 #' @param export Set to either "svg" or "png" to export plot in those formats.
 #' @param folder Export destination. Leave as `NULL` to export to current
 #'   directory.
@@ -265,6 +266,44 @@ gdiplot <- function(code,
     }
 
     plot <- plot_nmigmap(
+      hero = country,
+      basesize = basesize,
+      title = title,
+      caption = caption,
+      caption_maxchar = caption_maxchar,
+      width = width,
+      height = height
+    )
+  }
+
+  if (code == "idp") {
+
+    if (is.null(width)) width <- 12
+    if (is.null(height)) {
+      if (caption == TRUE | is.character(caption)) height <- 12 * 1.25
+      else height <- 12
+    }
+
+    plot <- plot_idp(
+      hero = country,
+      basesize = basesize,
+      title = title,
+      caption = caption,
+      caption_maxchar = caption_maxchar,
+      width = width,
+      height = height
+    )
+  }
+
+  if (code == "idcause") {
+
+    if (is.null(width)) width <- 12
+    if (is.null(height)) {
+      if (caption == TRUE | is.character(caption)) height <- 12 * 1.25
+      else height <- 12
+    }
+
+    plot <- plot_idcause(
       hero = country,
       basesize = basesize,
       title = title,
