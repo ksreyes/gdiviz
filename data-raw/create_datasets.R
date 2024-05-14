@@ -140,7 +140,11 @@ disasters <- dplyr::bind_rows(
 
 # Displacements by country and by coordinates
 
-idmc_nat <- readxl::read_excel("data-raw/raw/IDMC_Internal_Displacement_Conflict-Violence_Disasters.xlsx") |>
+idmc1 <- "IDMC_Internal_Displacement_Conflict-Violence_Disasters.xlsx"
+# idmc2 <- "IDMC_GIDD_Internal_Displacement_Disaggregated.xlsx"
+idmc2 <- "Displacements_geolocated.csv"
+
+idmc_nat <- readxl::read_excel(stringr::str_glue("data-raw/raw/{idmc1}")) |>
   dplyr::select(
     -tidyselect::ends_with("(Raw)"),
     -tidyselect::ends_with("Stock Displacement")
@@ -167,10 +171,7 @@ idmc_nat <- readxl::read_excel("data-raw/raw/IDMC_Internal_Displacement_Conflict
     v = as.integer(v)
   )
 
-idmc_geo <- readr::read_csv(
-  "data-raw/raw/Displacements_geolocated.csv",
-  show_col_types = FALSE
-) |>
+idmc_geo <- readr::read_csv(stringr::str_glue("data-raw/raw/{idmc2}")) |>
   dplyr::select(
     iso = CountryCode,
     category = type,
@@ -237,7 +238,6 @@ wpp <- readr::read_csv(
 captions <- readr::read_csv("data-raw/captions.csv")
 
 # usethis::use_data(captions, overwrite = TRUE)
-
 
 usethis::use_data(
   stocks,
