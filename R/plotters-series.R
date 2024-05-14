@@ -384,7 +384,9 @@ plot_pop <- function(hero,
       dplyr::filter(table, .data$iso == hero) |>
         dplyr::mutate(series = name),
       dplyr::filter(table, dplyr::between(.data$v, 10^5, 10^9)) |>
-        dplyr::summarise(v = median(.data$v, na.rm = TRUE), .by = .data$t) |>
+        dplyr::summarise(
+          v = stats::median(.data$v, na.rm = TRUE), .by = .data$t
+        ) |>
         dplyr::mutate(series = "World median")
     ) |>
       dplyr::mutate(
@@ -508,7 +510,7 @@ plot_birth <- function(hero,
         dplyr::mutate(series = name),
       dplyr::summarise(
         table,
-        v = median(.data$v, na.rm = TRUE),
+        v = stats::median(.data$v, na.rm = TRUE),
         .by = .data$t
       ) |>
         dplyr::mutate(series = "World median")
@@ -634,7 +636,7 @@ plot_depend <- function(hero,
         dplyr::mutate(series = name),
       dplyr::summarise(
         table,
-        v = median(.data$v, na.rm = TRUE),
+        v = stats::median(.data$v, na.rm = TRUE),
         .by = .data$t
       ) |>
         dplyr::mutate(series = "World median")

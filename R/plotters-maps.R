@@ -52,7 +52,7 @@ plot_nmigmap <- function(hero,
 
   df <- terra::as.data.frame(rast, xy = TRUE, na.rm = TRUE)
 
-  threshold <- quantile(df$layer, .95)
+  threshold <- stats::quantile(df$layer, .95)
   magnitude <- log10(threshold) |> floor()
   interval <- (threshold %/% 10^magnitude) * 10^magnitude
 
@@ -188,7 +188,7 @@ plot_popmap <- function(hero,
 
   df <- terra::as.data.frame(rast, xy = TRUE, na.rm = TRUE)
 
-  threshold <- quantile(df$pop, .95)
+  threshold <- stats::quantile(df$pop, .95)
   magnitude <- log10(threshold) |> floor()
   interval <- (threshold %/% 10^magnitude) * 10^magnitude
 
@@ -318,12 +318,7 @@ plot_incmap <- function(hero,
 
   df <- terra::as.data.frame(rast, xy = TRUE, na.rm = TRUE)
 
-  threshold <- quantile(df$income, .99)
-  # d <- ifelse(threshold - min(df$income) < 2000, 1, 0)
-
-  # threshold <- quantile(df$pop, .95)
-  # magnitude <- log10(threshold) |> floor()
-  # interval <- (threshold %/% 10^magnitude) * 10^magnitude
+  threshold <- stats::quantile(df$income, .99)
 
   # Chart
   plot <- ggplot2::ggplot() +
@@ -339,7 +334,9 @@ plot_incmap <- function(hero,
       low = pal("reds"),
       mid = "white",
       high = pal("blues"),
-      midpoint = median(dplyr::filter(df, .data$income < threshold)$income),
+      midpoint = stats::median(
+        dplyr::filter(df, .data$income < threshold)$income
+      ),
       labels = function(x) prettylabel(x, currency = "$")
     ) +
     ggplot2::geom_sf(

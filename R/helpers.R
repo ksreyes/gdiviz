@@ -227,16 +227,5 @@ format_caption <- function(text, max, bullet = FALSE, bgcolor = "white") {
     result
   )
 
-  # result <- gsub("\\(TOP10\\)", "<img src='images/top10.png' width=5>", result)
-  # result <- gsub("\\(TOP33\\)", "<img src='images/top33.png' width=5>", result)
-  # result <- gsub("\\(MID33\\)", "<img src='images/mid33.png' width=5>", result)
-  # result <- gsub("\\(BOT33\\)", "<img src='images/bot33.png' width=5>", result)
-  # result <- gsub("\\(BOT10\\)", "<img src='images/bot10.png' width=5>", result)
-
   return(result)
 }
-
-
-
-
-
