@@ -15,6 +15,119 @@ plot_ider <- function(plot_code) {
   )
 }
 
+get_avgs <- function(data, hero, world = TRUE) {
+
+  # Duplicate last year of migration stock data
+  # stocks <- read_csv("Data/Stocks_total.csv")
+  # latest_year <- colnames(stocks)[ncol(stocks)]
+  # ahead_year <- paste0("Y", as.numeric(substr(latest_year, 2, 5)) + 1)
+  # stocks[ahead_year] <- stocks[latest_year]
+  # stocks <- pivot_years(stocks)
+
+  data_iso <- dplyr::filter(data, .data$iso == hero)
+
+  if (nrow(data_iso) > 0) {
+
+    weights <- dplyr::bind_rows(
+      dplyr::filter(stocks, .data$from == hero) |>
+        dplyr::mutate(
+          share = .data$v / sum(.data$v),
+          type = "Destin",
+          .by = .data$t
+        ) |>
+        dplyr::select(.data$type, .data$t, iso = .data$to, .data$share),
+      dplyr::filter(stocks, .data$to == hero) |>
+        dplyr::mutate(
+          share = .data$v / sum(.data$v),
+          type = "Origin",
+          .by = .data$t
+        ) |>
+        dplyr::select(.data$type, .data$t, iso = .data$from, .data$share)
+    )
+
+    destin <- dplyr::left_join(
+      data,
+      dplyr::filter(weights, .data$type == "Destin"),
+      by = c("iso", "t")
+    ) |>
+      dplyr::mutate(weight = .data$v * .data$share) |>
+      tidyr::drop_na() |>
+      dplyr::summarise(weight = sum(.data$weight), .by = .data$t) |>
+      dplyr::mutate(
+        series = stringr::str_glue("{hero} emigrant-destination countries (avg)")
+      ) |>
+      dplyr::select(.data$t, .data$series, v = .data$weight)
+
+    origin <- dplyr::left_join(
+      data,
+      dplyr::filter(weights, .data$type == "Origin"),
+      by = c("iso", "t")
+    ) |>
+      dplyr::mutate(weight = .data$v * .data$share) |>
+      tidyr::drop_na() |>
+      dplyr::summarise(weight = sum(.data$weight), .by = .data$t) |>
+      dplyr::mutate(
+        series = stringr::str_glue("{hero} immigrant-origin countries (avg)")
+      ) |>
+      dplyr::select(.data$t, .data$series, v = .data$weight)
+
+    isoseries <- data_iso |>
+      dplyr::rename(series = .data$iso)
+
+    data_sum <- dplyr::bind_rows(isoseries, destin, origin) |>
+      dplyr::mutate(series = forcats::fct_relevel(.data$series, hero, after = 0))
+
+    if (world) {
+      world_median <- dplyr::summarise(
+        data,
+        v = stats::median(.data$v, na.rm = TRUE),
+        .by = .data$t
+      ) |>
+        dplyr::mutate(series = "World median") |>
+        dplyr::select(.data$t, .data$series, .data$v)
+      data_sum <- dplyr::bind_rows(data_sum, world_median) |>
+        dplyr::mutate(
+          series = forcats::fct_relevel(.data$series, "World median", after = 1)
+        )
+    }
+
+    return(data_sum)
+
+  } else {
+    return(data_iso)
+  }
+
+  # weights <- bind_rows(
+  #   filter(stocks, Origin == iso) |>
+  #     mutate(Share = Values / sum(Values), Type = "Destin", .by = Year) |>
+  #     select(Type, Year, CountryCode = Destin, Share),
+  #   filter(stocks, Destin == iso) |>
+  #     mutate(Share = Values / sum(Values), Type = "Origin", .by = Year) |>
+  #     select(Type, Year, CountryCode = Origin, Share)
+  # )
+
+  # destin <- left_join(
+  #   data,
+  #   filter(weights, Type == "Destin"), by = c("CountryCode", "Year")
+  # ) |>
+  #   mutate(Weight = Values * Share) |>
+  #   drop_na() |>
+  #   summarise(Weight = sum(Weight), .by = Year) |>
+  #   mutate(Series = str_glue("{iso} emigrant-destination countries (avg)")) |>
+  #   select(Year, Series, Values = Weight)
+
+  # origin <- left_join(
+  #   data,
+  #   filter(weights, Type == "Origin"), by = c("CountryCode", "Year")
+  # ) |>
+  #   mutate(Weight = Values * Share) |>
+  #   drop_na() |>
+  #   summarise(Weight = sum(Weight), .by = Year) |>
+  #   mutate(Series = str_glue("{iso} immigrant-origin countries (avg)")) |>
+  #   select(Year, Series, Values = Weight)
+}
+
+
 get_last <- function(data, group, group2 = NULL) {
   data1 <- data |>
     dplyr::select(.data$t, {{ group }}, {{ group2 }}, .data$v) |>
