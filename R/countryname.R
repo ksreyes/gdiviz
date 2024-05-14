@@ -19,7 +19,7 @@
 countryname <- function(key, from = "iso3c", to = "unname") {
   out <- c()
   for (k in key) {
-    hit <- countrynames[{to}][countrynames[{from}] == toupper(k)]
+    hit <- countrynames[{to}][countrynames[{from}] == k]
     if (length(hit) == 0) out <- c(out, NA)
     else out <- c(out, hit)
   }
