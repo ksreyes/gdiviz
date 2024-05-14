@@ -45,7 +45,7 @@ apply_theme <- function(type, basesize = 8, facets = FALSE) {
       legend.key.spacing.y = grid::unit(.1 * size$text, "points"),
       legend.text = ggplot2::element_text(
         size = size$text,
-        margin = ggplot2::margin(r = k(3.5), l = k(.5))
+        margin = ggplot2::margin(r = k(2.5), l = k())
       ),
       legend.title = ggplot2::element_blank(),
       legend.position = "bottom",
