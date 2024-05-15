@@ -17,13 +17,6 @@ plot_ider <- function(plot_code) {
 
 get_avgs <- function(data, hero, world = TRUE) {
 
-  # Duplicate last year of migration stock data
-  # stocks <- read_csv("Data/Stocks_total.csv")
-  # latest_year <- colnames(stocks)[ncol(stocks)]
-  # ahead_year <- paste0("Y", as.numeric(substr(latest_year, 2, 5)) + 1)
-  # stocks[ahead_year] <- stocks[latest_year]
-  # stocks <- pivot_years(stocks)
-
   data_iso <- dplyr::filter(data, .data$iso == hero)
 
   if (nrow(data_iso) > 0) {
@@ -96,37 +89,7 @@ get_avgs <- function(data, hero, world = TRUE) {
   } else {
     return(data_iso)
   }
-
-  # weights <- bind_rows(
-  #   filter(stocks, Origin == iso) |>
-  #     mutate(Share = Values / sum(Values), Type = "Destin", .by = Year) |>
-  #     select(Type, Year, CountryCode = Destin, Share),
-  #   filter(stocks, Destin == iso) |>
-  #     mutate(Share = Values / sum(Values), Type = "Origin", .by = Year) |>
-  #     select(Type, Year, CountryCode = Origin, Share)
-  # )
-
-  # destin <- left_join(
-  #   data,
-  #   filter(weights, Type == "Destin"), by = c("CountryCode", "Year")
-  # ) |>
-  #   mutate(Weight = Values * Share) |>
-  #   drop_na() |>
-  #   summarise(Weight = sum(Weight), .by = Year) |>
-  #   mutate(Series = str_glue("{iso} emigrant-destination countries (avg)")) |>
-  #   select(Year, Series, Values = Weight)
-
-  # origin <- left_join(
-  #   data,
-  #   filter(weights, Type == "Origin"), by = c("CountryCode", "Year")
-  # ) |>
-  #   mutate(Weight = Values * Share) |>
-  #   drop_na() |>
-  #   summarise(Weight = sum(Weight), .by = Year) |>
-  #   mutate(Series = str_glue("{iso} immigrant-origin countries (avg)")) |>
-  #   select(Year, Series, Values = Weight)
 }
-
 
 get_last <- function(data, group, group2 = NULL) {
   data1 <- data |>
