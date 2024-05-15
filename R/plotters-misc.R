@@ -65,10 +65,7 @@ plot_idp <- function(hero,
 
       # Aesthetics
       apply_theme(type = "bar-vertical", basesize) +
-      ggplot2::scale_y_continuous(
-        name = "thousands of persons",
-        labels = scale_labels
-      ) +
+      ggplot2::scale_y_continuous(labels = prettylabel) +
       ggplot2::theme(
         axis.text.x = ggplot2::element_text(
           margin = ggplot2::margin(t = -k(.5))
@@ -85,10 +82,22 @@ plot_idp <- function(hero,
     # Caption
     caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
     if (is.logical(caption) & caption == TRUE & nrow(caption_set) > 0) {
-      cap <- gsub(pattern = hero, replacement = name, caption_set$Netmigration)
+      cap1 <- gsub(
+        pattern = hero,
+        replacement = name,
+        caption_set$DisasterDisplacements
+      )
+      cap2 <- gsub(
+        pattern = hero,
+        replacement = name,
+        caption_set$ConflictDisplacements
+      )
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
-        format_caption(cap, max = caption_maxchar)
+        "\u00B7 ",
+        format_caption(cap1, max = caption_maxchar, bullet = TRUE),
+        "<br>", "\u00B7 ",
+        format_caption(cap2, max = caption_maxchar, bullet = TRUE)
       )
     } else if (is.character(caption) | is.numeric(caption)) {
       caption_text <- paste0(
@@ -228,8 +237,158 @@ plot_idcause <- function(hero,
 
     # Caption
     caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
+    if (is.character(caption) | is.numeric(caption)) {
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(caption, max = caption_maxchar)
+      )
+    } else {
+      caption_text <- format_source(
+        ids$source,
+        basesize = basesize,
+        space_after = FALSE
+      )
+    }
+    plot <- plot + ggplot2::labs(caption = caption_text)
+
+  } else {
+
+    # Fallback if data is missing
+
+    plot <- ggplot2::ggplot() + apply_theme(type = "void", basesize)
+    if (is.logical(title) & title == TRUE) {
+      plot <- plot + ggplot2::ggtitle(ids$title)
+    } else if (is.character(title) | is.numeric(title)) {
+      plot <- plot + ggplot2::ggtitle(title)
+    }
+    if (is.character(caption) | is.numeric(caption)) {
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(caption, max = caption_maxchar)
+      )
+    } else {
+      caption_text <- format_source(
+        ids$source,
+        basesize = basesize,
+        space_after = FALSE
+      )
+    }
+    plot <- plot + ggplot2::labs(caption = caption_text)
+    plot <- cowplot::ggdraw(plot) +
+      cowplot::draw_label("No data", color = pal("blues", 3), size = size$text)
+  }
+
+  return(plot)
+}
+
+# Biophysical disruption --------------------------------------------------
+
+plot_disrupt <- function(hero,
+                         basesize = 8,
+                         title = TRUE,
+                         caption = FALSE,
+                         caption_maxchar = NULL,
+                         width = 12,
+                         height = 8) {
+
+  # Parameters
+  size <- sizer(basesize)
+  name_maxchar <- (width / basesize) * 15
+  caption_maxchar <- (width / basesize) * 55
+  k <- function(factor = 1) factor * size$text / ggplot2::.pt
+  ids <- plot_ider("disrupt")
+  name <- namer(hero, name_maxchar)
+
+  # Data
+  df <- disasters |>
+    dplyr::filter(
+      .data$category == "People affected" &
+        .data$iso == hero &
+        .data$v > 0
+    )
+
+  if (nrow(dplyr::filter(df, .data$v > 0)) > 0) {
+
+    selected_disasters <- df |>
+      dplyr::summarise(v = sum(v), .by = type) |>
+      dplyr::arrange(dplyr::desc(v)) |>
+      dplyr::slice_head(n = 3) |>
+      dplyr::pull(type)
+
+    df <- df |>
+      dplyr::mutate(
+        type = dplyr::case_when(
+          .data$type %in% selected_disasters ~ .data$type,
+          .default = "Others"
+        ),
+        type = forcats::fct_reorder(type, -v, sum),
+      ) |>
+      tidyr::complete(
+        .data$iso,
+        .data$category,
+        .data$type,
+        t = tidyr::full_seq(.data$t, 1),
+        fill = list(v = 0)
+      )
+
+    if ("Others" %in% df$type) {
+      df <- dplyr::mutate(
+          df,
+          type = forcats::fct_relevel(type, "Others", after = Inf)
+        )
+    }
+
+    df_agg <- dplyr::summarise(df, v = sum(.data$v), .by = .data$t) |>
+      dplyr::filter(.data$v > 0)
+
+    plot <- ggplot2::ggplot() +
+      ggplot2::geom_bar(
+        ggplot2::aes(x = factor(.data$t), y = .data$v, fill = .data$type),
+        df,
+        stat = "identity", position = "stack", width = .7
+      ) +
+      ggplot2::scale_fill_manual(
+        values = c(
+          pal("blues"), pal("blues", 3), pal("blues", 5), pal("grays", 2)
+        )) +
+      ggplot2::geom_text(
+        ggplot2::aes(
+          x = factor(.data$t),
+          y = .data$v,
+          label = prettylabel(.data$v)
+        ),
+        df_agg,
+        size = k(.8), color = pal("blues"), fontface = "bold",
+        nudge_y = max(df$v) / 50, vjust = 0
+      ) +
+
+      # Aesthetics
+      apply_theme(type = "bar-vertical", basesize) +
+      ggplot2::scale_x_discrete(label = function(x) ifelse(
+        x == 2000,
+        "2000",
+        paste0("'", substr(x, 3, 4)))
+      ) +
+      ggplot2::scale_y_continuous(labels = prettylabel) +
+      ggplot2::theme(
+        axis.text.x = ggplot2::element_text(
+          margin = ggplot2::margin(t = -k(.5))
+        ),
+        legend.position = "right"
+      )
+
+    # Title
+    title_auto <- paste0(ids$title, ", ", range(df))
+    if (is.logical(title) & title == TRUE) {
+      plot <- plot + ggplot2::ggtitle(title_auto)
+    } else if (is.character(title) | is.numeric(title)) {
+      plot <- plot + ggplot2::ggtitle(title)
+    }
+
+    # Caption
+    caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
     if (is.logical(caption) & caption == TRUE & nrow(caption_set) > 0) {
-      cap <- gsub(pattern = hero, replacement = name, caption_set$Netmigration)
+      cap <- gsub(pattern = hero, replacement = name, caption_set$DisasterAffected)
       caption_text <- paste0(
         format_source(ids$source, basesize = basesize),
         format_caption(cap, max = caption_maxchar)

@@ -733,3 +733,578 @@ plot_depend <- function(hero,
 
   return(plot)
 }
+
+# Income ------------------------------------------------------------------
+
+plot_income <- function(hero,
+                        basesize = 8,
+                        title = TRUE,
+                        caption = FALSE,
+                        caption_maxchar = NULL,
+                        width = 12,
+                        height = 8) {
+
+  # Parameters
+  size <- sizer(basesize)
+  name_maxchar <- (width / basesize) * 15
+  caption_maxchar <- (width / basesize) * 55
+  k <- function(factor = 1) factor * size$text / ggplot2::.pt
+  ids <- plot_ider("income")
+  name <- namer(hero, name_maxchar)
+
+  # Data
+  df <- dplyr::filter(indicators, .data$var == "inc") |>
+    get_avgs(hero)
+
+  if (nrow(df) > 0) {
+
+    plot <- ggplot2::ggplot(
+      df,
+      ggplot2::aes(
+        x = factor(.data$t),
+        y = .data$v,
+        color = .data$series,
+        linetype = .data$series,
+        group = .data$series
+      )) +
+      ggplot2::geom_line(linewidth = k(.3), na.rm = TRUE) +
+      ggplot2::scale_color_manual(values = palettes$n4) +
+      add_labels(
+        df, .data$series,
+        basesize = basesize,
+        currency = "$", colorscale = palettes$n3
+      ) +
+
+      # Aesthetics
+      apply_theme(type = "line", basesize) +
+      ggplot2::scale_x_discrete(
+        breaks = seq(span(df)[1], span(df)[2], 10),
+        expand = ggplot2::expansion(mult = c(.03, .10))
+      ) +
+      ggplot2::scale_y_continuous(labels = prettylabel) +
+      ggplot2::theme(
+        axis.title.y = ggplot2::element_blank(),
+        legend.text = ggplot2::element_text(size = size$stext)
+      )
+
+    # Title
+    title_auto <- paste0(ids$title, ", ", range(df))
+    if (is.logical(title) & title == TRUE) {
+      plot <- plot + ggplot2::ggtitle(title_auto)
+    } else if (is.character(title) | is.numeric(title)) {
+      plot <- plot + ggplot2::ggtitle(title)
+    }
+
+    # Caption
+    caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
+    if (is.logical(caption) & caption == TRUE & nrow(caption_set) > 0) {
+      cap <- gsub(pattern = hero, replacement = name, caption_set$Income)
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(cap, max = caption_maxchar)
+      )
+    } else if (is.character(caption) | is.numeric(caption)) {
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(caption, max = caption_maxchar)
+      )
+    } else {
+      caption_text <- format_source(
+        ids$source,
+        basesize = basesize,
+        space_after = FALSE
+      )
+    }
+    plot <- plot + ggplot2::labs(caption = caption_text)
+
+  } else {
+
+    # Fallback if data is missing
+
+    plot <- ggplot2::ggplot() + apply_theme(type = "void", basesize)
+    if (is.logical(title) & title == TRUE) {
+      plot <- plot + ggplot2::ggtitle(ids$title)
+    } else if (is.character(title) | is.numeric(title)) {
+      plot <- plot + ggplot2::ggtitle(title)
+    }
+    if (is.character(caption) | is.numeric(caption)) {
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(caption, max = caption_maxchar)
+      )
+    } else {
+      caption_text <- format_source(
+        ids$source,
+        basesize = basesize,
+        space_after = FALSE
+      )
+    }
+    plot <- plot + ggplot2::labs(caption = caption_text)
+    plot <- cowplot::ggdraw(plot) +
+      cowplot::draw_label("No data", color = pal("blues", 3), size = size$text)
+  }
+
+  return(plot)
+}
+
+# Unemployment ------------------------------------------------------------
+
+plot_unem <- function(hero,
+                      basesize = 8,
+                      title = TRUE,
+                      caption = FALSE,
+                      caption_maxchar = NULL,
+                      width = 12,
+                      height = 8) {
+
+  # Parameters
+  size <- sizer(basesize)
+  name_maxchar <- (width / basesize) * 15
+  caption_maxchar <- (width / basesize) * 55
+  k <- function(factor = 1) factor * size$text / ggplot2::.pt
+  ids <- plot_ider("unem")
+  name <- namer(hero, name_maxchar)
+
+  # Data
+  df <- dplyr::filter(indicators, .data$var == "unem") |>
+    get_avgs(hero)
+
+  if (nrow(df) > 0) {
+
+    plot <- ggplot2::ggplot(
+      df,
+      ggplot2::aes(
+        x = factor(.data$t),
+        y = .data$v,
+        color = .data$series,
+        linetype = .data$series,
+        group = .data$series
+      )) +
+      ggplot2::geom_line(linewidth = k(.3), na.rm = TRUE) +
+      ggplot2::scale_color_manual(values = palettes$n4) +
+      add_labels(
+        df, .data$series,
+        basesize = basesize,
+        pct = TRUE, colorscale = palettes$n3
+      ) +
+
+      # Aesthetics
+      apply_theme(type = "line", basesize) +
+      ggplot2::scale_x_discrete(
+        breaks = seq(span(df)[1], span(df)[2], 10),
+        expand = ggplot2::expansion(mult = c(.03, .10))
+      ) +
+      ggplot2::scale_y_continuous(
+        labels = function(x) prettylabel(x, pct = TRUE)
+      ) +
+      ggplot2::theme(
+        axis.title.y = ggplot2::element_blank(),
+        legend.text = ggplot2::element_text(size = size$stext)
+      )
+
+    # Title
+    title_auto <- paste0(ids$title, ", ", range(df))
+    if (is.logical(title) & title == TRUE) {
+      plot <- plot + ggplot2::ggtitle(title_auto)
+    } else if (is.character(title) | is.numeric(title)) {
+      plot <- plot + ggplot2::ggtitle(title)
+    }
+
+    # Caption
+    caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
+    if (is.logical(caption) & caption == TRUE & nrow(caption_set) > 0) {
+      cap <- gsub(pattern = hero, replacement = name, caption_set$Unemployment)
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(cap, max = caption_maxchar)
+      )
+    } else if (is.character(caption) | is.numeric(caption)) {
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(caption, max = caption_maxchar)
+      )
+    } else {
+      caption_text <- format_source(
+        ids$source,
+        basesize = basesize,
+        space_after = FALSE
+      )
+    }
+    plot <- plot + ggplot2::labs(caption = caption_text)
+
+  } else {
+
+    # Fallback if data is missing
+
+    plot <- ggplot2::ggplot() + apply_theme(type = "void", basesize)
+    if (is.logical(title) & title == TRUE) {
+      plot <- plot + ggplot2::ggtitle(ids$title)
+    } else if (is.character(title) | is.numeric(title)) {
+      plot <- plot + ggplot2::ggtitle(title)
+    }
+    if (is.character(caption) | is.numeric(caption)) {
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(caption, max = caption_maxchar)
+      )
+    } else {
+      caption_text <- format_source(
+        ids$source,
+        basesize = basesize,
+        space_after = FALSE
+      )
+    }
+    plot <- plot + ggplot2::labs(caption = caption_text)
+    plot <- cowplot::ggdraw(plot) +
+      cowplot::draw_label("No data", color = pal("blues", 3), size = size$text)
+  }
+
+  return(plot)
+}
+
+# Inflation ---------------------------------------------------------------
+
+plot_inf <- function(hero,
+                     basesize = 8,
+                     title = TRUE,
+                     caption = FALSE,
+                     caption_maxchar = NULL,
+                     width = 12,
+                     height = 8) {
+
+  # Parameters
+  size <- sizer(basesize)
+  name_maxchar <- (width / basesize) * 15
+  caption_maxchar <- (width / basesize) * 55
+  k <- function(factor = 1) factor * size$text / ggplot2::.pt
+  ids <- plot_ider("inf")
+  name <- namer(hero, name_maxchar)
+
+  # Data
+  df <- dplyr::filter(indicators, .data$var == "inf") |>
+    get_avgs(hero)
+
+  if (nrow(df) > 0) {
+
+    plot <- ggplot2::ggplot(
+      df,
+      ggplot2::aes(
+        x = factor(.data$t),
+        y = .data$v,
+        color = .data$series,
+        linetype = .data$series,
+        group = .data$series
+      )) +
+      ggplot2::geom_line(linewidth = k(.3), na.rm = TRUE) +
+      ggplot2::scale_color_manual(values = palettes$n4) +
+      add_labels(
+        df, .data$series,
+        basesize = basesize,
+        pct = TRUE, colorscale = palettes$n3
+      ) +
+
+      # Aesthetics
+      apply_theme(type = "line", basesize) +
+      ggplot2::scale_x_discrete(
+        breaks = seq(span(df)[1], span(df)[2], 10),
+        expand = ggplot2::expansion(mult = c(.03, .10))
+      ) +
+      ggplot2::scale_y_continuous(
+        labels = function(x) prettylabel(x, pct = TRUE)
+      ) +
+      ggplot2::theme(
+        axis.title.y = ggplot2::element_blank(),
+        legend.text = ggplot2::element_text(size = size$stext)
+      )
+
+    # Title
+    title_auto <- paste0(ids$title, ", ", range(df))
+    if (is.logical(title) & title == TRUE) {
+      plot <- plot + ggplot2::ggtitle(title_auto)
+    } else if (is.character(title) | is.numeric(title)) {
+      plot <- plot + ggplot2::ggtitle(title)
+    }
+
+    # Caption
+    caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
+    if (is.logical(caption) & caption == TRUE & nrow(caption_set) > 0) {
+      cap <- gsub(pattern = hero, replacement = name, caption_set$Inflation)
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(cap, max = caption_maxchar)
+      )
+    } else if (is.character(caption) | is.numeric(caption)) {
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(caption, max = caption_maxchar)
+      )
+    } else {
+      caption_text <- format_source(
+        ids$source,
+        basesize = basesize,
+        space_after = FALSE
+      )
+    }
+    plot <- plot + ggplot2::labs(caption = caption_text)
+
+  } else {
+
+    # Fallback if data is missing
+
+    plot <- ggplot2::ggplot() + apply_theme(type = "void", basesize)
+    if (is.logical(title) & title == TRUE) {
+      plot <- plot + ggplot2::ggtitle(ids$title)
+    } else if (is.character(title) | is.numeric(title)) {
+      plot <- plot + ggplot2::ggtitle(title)
+    }
+    if (is.character(caption) | is.numeric(caption)) {
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(caption, max = caption_maxchar)
+      )
+    } else {
+      caption_text <- format_source(
+        ids$source,
+        basesize = basesize,
+        space_after = FALSE
+      )
+    }
+    plot <- plot + ggplot2::labs(caption = caption_text)
+    plot <- cowplot::ggdraw(plot) +
+      cowplot::draw_label("No data", color = pal("blues", 3), size = size$text)
+  }
+
+  return(plot)
+}
+
+# Societal division -------------------------------------------------------
+
+plot_grieve <- function(hero,
+                        basesize = 8,
+                        title = TRUE,
+                        caption = FALSE,
+                        caption_maxchar = NULL,
+                        width = 12,
+                        height = 8) {
+
+  # Parameters
+  size <- sizer(basesize)
+  name_maxchar <- (width / basesize) * 15
+  caption_maxchar <- (width / basesize) * 55
+  k <- function(factor = 1) factor * size$text / ggplot2::.pt
+  ids <- plot_ider("grieve")
+  name <- namer(hero, name_maxchar)
+
+  # Data
+  df <- dplyr::filter(indicators, .data$var == "grieve") |>
+    get_avgs(hero)
+
+  if (nrow(df) > 0) {
+
+    plot <- ggplot2::ggplot(
+      df,
+      ggplot2::aes(
+        x = factor(.data$t),
+        y = .data$v,
+        color = .data$series,
+        linetype = .data$series,
+        group = .data$series
+      )) +
+      ggplot2::geom_line(linewidth = k(.3), na.rm = TRUE) +
+      ggplot2::scale_color_manual(values = palettes$n4) +
+      add_labels(
+        df, .data$series,
+        basesize = basesize,
+        colorscale = palettes$n3
+      ) +
+
+      # Aesthetics
+      apply_theme(type = "line", basesize) +
+      ggplot2::scale_x_discrete(
+        breaks = seq(span(df)[1], span(df)[2], 10),
+        expand = ggplot2::expansion(mult = c(.03, .10))
+      ) +
+      ggplot2::scale_y_continuous(
+        name = "Group Grievance Index",
+        labels = prettylabel
+      ) +
+      ggplot2::theme(
+        axis.title.y = ggplot2::element_blank(),
+        legend.text = ggplot2::element_text(size = size$stext)
+      )
+
+    # Title
+    title_auto <- paste0(ids$title, ", ", range(df))
+    if (is.logical(title) & title == TRUE) {
+      plot <- plot + ggplot2::ggtitle(title_auto)
+    } else if (is.character(title) | is.numeric(title)) {
+      plot <- plot + ggplot2::ggtitle(title)
+    }
+
+    # Caption
+    caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
+    if (is.logical(caption) & caption == TRUE & nrow(caption_set) > 0) {
+      cap <- gsub(pattern = hero, replacement = name, caption_set$SocialDivision)
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(cap, max = caption_maxchar)
+      )
+    } else if (is.character(caption) | is.numeric(caption)) {
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(caption, max = caption_maxchar)
+      )
+    } else {
+      caption_text <- format_source(
+        ids$source,
+        basesize = basesize,
+        space_after = FALSE
+      )
+    }
+    plot <- plot + ggplot2::labs(caption = caption_text)
+
+  } else {
+
+    # Fallback if data is missing
+
+    plot <- ggplot2::ggplot() + apply_theme(type = "void", basesize)
+    if (is.logical(title) & title == TRUE) {
+      plot <- plot + ggplot2::ggtitle(ids$title)
+    } else if (is.character(title) | is.numeric(title)) {
+      plot <- plot + ggplot2::ggtitle(title)
+    }
+    if (is.character(caption) | is.numeric(caption)) {
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(caption, max = caption_maxchar)
+      )
+    } else {
+      caption_text <- format_source(
+        ids$source,
+        basesize = basesize,
+        space_after = FALSE
+      )
+    }
+    plot <- plot + ggplot2::labs(caption = caption_text)
+    plot <- cowplot::ggdraw(plot) +
+      cowplot::draw_label("No data", color = pal("blues", 3), size = size$text)
+  }
+
+  return(plot)
+}
+
+# Political stability -----------------------------------------------------
+
+plot_polstb <- function(hero,
+                        basesize = 8,
+                        title = TRUE,
+                        caption = FALSE,
+                        caption_maxchar = NULL,
+                        width = 12,
+                        height = 8) {
+
+  # Parameters
+  size <- sizer(basesize)
+  name_maxchar <- (width / basesize) * 15
+  caption_maxchar <- (width / basesize) * 55
+  k <- function(factor = 1) factor * size$text / ggplot2::.pt
+  ids <- plot_ider("polstb")
+  name <- namer(hero, name_maxchar)
+
+  # Data
+  df <- dplyr::filter(indicators, .data$var == "polstb") |>
+    get_avgs(hero)
+
+  if (nrow(df) > 0) {
+
+    plot <- ggplot2::ggplot(
+      df,
+      ggplot2::aes(
+        x = factor(.data$t),
+        y = .data$v,
+        color = .data$series,
+        linetype = .data$series,
+        group = .data$series
+      )) +
+      ggplot2::geom_line(linewidth = k(.3), na.rm = TRUE) +
+      ggplot2::scale_color_manual(values = palettes$n4) +
+      add_labels(
+        df, .data$series,
+        basesize = basesize,
+        colorscale = palettes$n3
+      ) +
+
+      # Aesthetics
+      apply_theme(type = "line", basesize) +
+      ggplot2::scale_x_discrete(
+        breaks = seq(span(df)[1], span(df)[2], 10),
+        expand = ggplot2::expansion(mult = c(.03, .10))
+      ) +
+      ggplot2::scale_y_continuous(
+        name = "std. deviation from mean",
+        labels = prettylabel
+      ) +
+      ggplot2::theme(
+        axis.title.y = ggplot2::element_blank(),
+        legend.text = ggplot2::element_text(size = size$stext)
+      )
+
+    # Title
+    title_auto <- paste0(ids$title, ", ", range(df))
+    if (is.logical(title) & title == TRUE) {
+      plot <- plot + ggplot2::ggtitle(title_auto)
+    } else if (is.character(title) | is.numeric(title)) {
+      plot <- plot + ggplot2::ggtitle(title)
+    }
+
+    # Caption
+    caption_set <- dplyr::filter(captions, .data$CountryCode == hero)
+    if (is.logical(caption) & caption == TRUE & nrow(caption_set) > 0) {
+      cap <- gsub(pattern = hero, replacement = name, caption_set$PoliticalStability)
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(cap, max = caption_maxchar)
+      )
+    } else if (is.character(caption) | is.numeric(caption)) {
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(caption, max = caption_maxchar)
+      )
+    } else {
+      caption_text <- format_source(
+        ids$source,
+        basesize = basesize,
+        space_after = FALSE
+      )
+    }
+    plot <- plot + ggplot2::labs(caption = caption_text)
+
+  } else {
+
+    # Fallback if data is missing
+
+    plot <- ggplot2::ggplot() + apply_theme(type = "void", basesize)
+    if (is.logical(title) & title == TRUE) {
+      plot <- plot + ggplot2::ggtitle(ids$title)
+    } else if (is.character(title) | is.numeric(title)) {
+      plot <- plot + ggplot2::ggtitle(title)
+    }
+    if (is.character(caption) | is.numeric(caption)) {
+      caption_text <- paste0(
+        format_source(ids$source, basesize = basesize),
+        format_caption(caption, max = caption_maxchar)
+      )
+    } else {
+      caption_text <- format_source(
+        ids$source,
+        basesize = basesize,
+        space_after = FALSE
+      )
+    }
+    plot <- plot + ggplot2::labs(caption = caption_text)
+    plot <- cowplot::ggdraw(plot) +
+      cowplot::draw_label("No data", color = pal("blues", 3), size = size$text)
+  }
+
+  return(plot)
+}
