@@ -2,6 +2,7 @@
 
 export(apply_theme)
 export(break_lines)
+export(check_data)
 export(countryname)
 export(format_source)
 export(gdiplot)
