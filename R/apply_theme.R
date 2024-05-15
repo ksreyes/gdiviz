@@ -42,7 +42,7 @@ apply_theme <- function(type, basesize = 8, facets = FALSE) {
 
       legend.background = ggplot2::element_blank(),
       legend.key = ggplot2::element_blank(),
-      legend.key.spacing.y = grid::unit(.1 * size$text, "points"),
+      legend.key.spacing.y = grid::unit(.25 * size$text, "points"),
       legend.text = ggplot2::element_text(
         size = size$text,
         margin = ggplot2::margin(r = k(2.5), l = k())

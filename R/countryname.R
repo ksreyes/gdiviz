@@ -16,7 +16,7 @@
 #' # DEU
 #'
 #' @export
-countryname <- function(key, from = "iso3c", to = "unname") {
+countryname <- function(key, from = "iso3c", to = "name") {
   out <- c()
   for (k in key) {
     hit <- countrynames[{to}][countrynames[{from}] == k]
