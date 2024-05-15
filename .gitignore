@@ -5,7 +5,9 @@
 .DS_store
 
 test
+data-raw/_archive
 data-raw/raw
+data-raw/fragile_states_index
 data-raw/*.xlsx
 data-raw/*.csv
 
