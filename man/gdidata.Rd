@@ -5,12 +5,13 @@
 \alias{gdidata}
 \title{List of datasets}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 17 rows and 5 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 18 rows and 7 columns.
 }
 \usage{
 gdidata
 }
 \description{
-All available datasets.
+This lists all the datasets bundled with \code{gdiviz}. \code{indicators} groups
+together all single-variable time series.
 }
 \keyword{datasets}

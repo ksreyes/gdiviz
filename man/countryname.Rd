@@ -4,7 +4,7 @@
 \alias{countryname}
 \title{Toggle between country names and ISO codes}
 \usage{
-countryname(key, from = "iso3c", to = "unname")
+countryname(key, from = "iso3c", to = "name")
 }
 \arguments{
 \item{key}{Name or ISO code of country.}
