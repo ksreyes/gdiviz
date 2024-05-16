@@ -17,7 +17,8 @@ pivot_years <- function(data) {
 countrynames <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "countries")
 usethis::use_data(countrynames, overwrite = TRUE)
 
-gdidata <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "datasets")
+gdidata <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "datasets") |>
+  mutate(last_updated = as.Date(last_updated))
 usethis::use_data(gdidata, overwrite = TRUE)
 
 gdiplots <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "plots")
@@ -41,46 +42,46 @@ stocks <- dplyr::bind_rows(
 
 usethis::use_data(stocks, overwrite = TRUE)
 
-# Disasters ---------------------------------------------------------------
+# Biophysical disruptions -------------------------------------------------
 
-wrangle_disaster <- function(category_code, category) {
+wrangle_disrupt <- function(category_code, category) {
 
   files <- list.files(
-    "data-raw/raw",
+    "data-raw/disrupt",
     pattern = stringr::str_glue("^{category_code}_.*$"),
     full.names = TRUE
   )
 
-  df <- tibble::tibble()
+  df <- tibble()
 
   for (file in files) {
 
     type <- gsub(
-      stringr::str_glue("^{category_code}_(.*?)\\.csv$"),
+      str_glue("^{category_code}_(.*?)\\.csv$"),
       "\\1",
       basename(file)
     )
 
-    df_i <- readr::read_csv(file, show_col_types = FALSE) |>
+    df_i <- read_csv(file, show_col_types = FALSE) |>
       pivot_years() |>
-      dplyr::mutate(category = category, type = type) |>
-      dplyr::select(iso = CountryCode, category, type, t, v)
+      mutate(category = category, type = type) |>
+      select(iso = CountryCode, category, type, t, v)
 
-    df <- dplyr::bind_rows(df, df_i)
+    df <- bind_rows(df, df_i)
   }
 
   return(df)
 }
 
-disasters <- dplyr::bind_rows(
-  wrangle_disaster("Displacements", "People displaced"),
-  wrangle_disaster("PeopleAffected", "People affected"),
-  wrangle_disaster("PeopleKilled", "People killed"),
-  wrangle_disaster("EconomicDamage", "Economic damage"),
+disrupt <- bind_rows(
+  wrangle_disrupt("Displacements", "People displaced"),
+  wrangle_disrupt("PeopleAffected", "People affected"),
+  wrangle_disrupt("PeopleKilled", "People killed"),
+  wrangle_disrupt("EconomicDamage", "Economic damage"),
 ) |>
-  dplyr::filter(type != "Disasters") |>
-  dplyr::mutate(
-    type = dplyr::case_when(
+  filter(type != "Disasters") |>
+  mutate(
+    type = case_when(
       type == "Droughts"                                ~ "Drought",
       type == "Earthquakes"                             ~ "Earthquake",
       type %in% c("Extreme Temperature", "Extreme temperatures")
@@ -93,9 +94,10 @@ disasters <- dplyr::bind_rows(
       .default = type
     )
   ) |>
-  tidyr::drop_na()
+  drop_na() |>
+  filter(t >= 2000)
 
-# usethis::use_data(disasters, overwrite = TRUE)
+usethis::use_data(disrupt, overwrite = TRUE)
 
 # IDMC --------------------------------------------------------------------
 
@@ -150,10 +152,39 @@ wpp <- readr::read_csv(
 
 usethis::use_data(wpp, overwrite = TRUE)
 
+# MPP ---------------------------------------------------------------------
+
+mpp <- readr::read_csv("data-raw/Missing_Migrants_Global_Figures_allData.csv") |>
+  mutate(
+    location = countrycode::countrycode(
+      `Country of Incident`,
+      origin = "country.name",
+      destination = "iso3c"
+    ),
+    longitude = str_split_i(Coordinates, ",", 2) |> as.numeric(),
+    latitude = str_split_i(Coordinates, ",", 1) |> as.numeric()
+  ) |>
+  select(
+    location,
+    origin = `Country of Origin`,
+    longitude,
+    latitude,
+    date = `Incident Date`,
+    route = `Migration Route`,
+    cause_of_death = `Cause of Death`,
+    Dead = `Number of Dead`,
+    Missing = `Minimum Estimated Number of Missing`
+  ) |>
+  pivot_longer(cols = c("Dead", "Missing"), names_to = "type", values_to = "v") |>
+  drop_na(v) |>
+  filter(v > 0)
+
+usethis::use_data(mpp, overwrite = TRUE)
+
 # Internal ----------------------------------------------------------------
 
 file <- "Displacements_geolocated.csv"
-idmc_geo <- readr::read_csv(stringr::str_glue("data-raw/raw/{file}")) |>
+idmc_geo <- readr::read_csv(stringr::str_glue("data-raw/{file}")) |>
   select(
     iso = CountryCode,
     category = type,
@@ -181,7 +212,6 @@ idmc_geo <- readr::read_csv(stringr::str_glue("data-raw/raw/{file}")) |>
 captions <- readr::read_csv("data-raw/captions.csv")
 
 usethis::use_data(
-  disasters,
   idmc_geo,
   captions,
   internal = TRUE,

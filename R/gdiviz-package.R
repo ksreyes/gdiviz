@@ -6,4 +6,14 @@
 ## usethis namespace: end
 NULL
 
-utils::globalVariables(c("countrynames", "gdiplots", "gdidata"))
+utils::globalVariables(c(
+  "countrynames",
+  "gdiplots",
+  "gdidata",
+  "stocks",
+  "indicators",
+  "idmc",
+  "wpp",
+  "mmp",
+  "disrupt"
+))
