@@ -31,6 +31,20 @@ library(gdiviz)
 gdiplot(code = "stocks", country = "DEU")
 ```
 
+![](inst/images/stocks_DEU.png)
+
+``` r
+gdiplot(code = "popmap", country = "DEU")
+```
+
+![](inst/images/popmap_DEU.png)
+
+``` r
+gdiplot(code = "idp", country = "DEU")
+```
+
+![](inst/images/idp_DEU.png)
+
 To see the list of available charts and their respective codes, run
 `gdiplots`. Charts can be exported as SVG or PNG files with the `export`
 argument. See `?gdiplot` for more information on this and other
@@ -46,6 +60,26 @@ For example, `countryname("DEU")` returns “Germany”. The reverse is also
 possible, with `countryname("Germany", from = "name", to = "iso3c")`
 returning “DEU”. Alternatively, run `countrynames` to see the full list
 of countries.
+
+## Advanced usage
+
+The function `apply_theme()` can be used to apply IOM theming to any
+`ggplot` chart. For example:
+
+``` r
+library(ggplot2)
+library(gdiviz)
+iris |>
+  dplyr::summarise(Sepal.Length = mean(Sepal.Length), .by = Species) |>
+  ggplot(aes(x = Species, y = Sepal.Length)) +
+  geom_bar(stat = "identity", fill = pal("blues")) +
+  ggtitle("The iris dataset") +
+  apply_theme("bar-vertical")
+```
+
+![](inst/images/irischart.png) Default sizes are optimized for export as
+an image with width 12 cm at 300 dpi. IOM color palettes are also
+available using `pal()`. See function documentation for details.
 
 ## Disclaimer
 
