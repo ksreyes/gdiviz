@@ -19,7 +19,6 @@ plot_idp <- function(hero,
 
   # Data
   df <- idmc |>
-    dplyr::filter(.data$dataset == "national") |>
     tidyr::complete(
       .data$iso,
       t = tidyr::full_seq(.data$t, 1),
@@ -65,6 +64,12 @@ plot_idp <- function(hero,
 
       # Aesthetics
       apply_theme(type = "bar-vertical", basesize) +
+      ggplot2::scale_x_discrete(
+        label = function(x) ifelse(
+          x == "2008",
+          "2008",
+          paste0("'", substr(as.character(x), 3, 4)))
+      ) +
       ggplot2::scale_y_continuous(labels = prettylabel) +
       ggplot2::theme(
         axis.text.x = ggplot2::element_text(
@@ -162,7 +167,7 @@ plot_idcause <- function(hero,
   name <- namer(hero, name_maxchar)
 
   # Data
-  df_raw <- disasters |>
+  df_raw <- disrupt |>
     dplyr::filter(
       .data$iso == hero,
       .data$category == "People displaced",
@@ -300,7 +305,7 @@ plot_disrupt <- function(hero,
   name <- namer(hero, name_maxchar)
 
   # Data
-  df <- disasters |>
+  df <- disrupt |>
     dplyr::filter(
       .data$category == "People affected" &
         .data$iso == hero &
