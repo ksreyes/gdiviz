@@ -6,7 +6,7 @@
 
 test
 data-raw/_archive
-data-raw/raw
+data-raw/disrupt
 data-raw/fragile_states_index
 data-raw/*.xlsx
 data-raw/*.csv
