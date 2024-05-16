@@ -71,7 +71,10 @@ countryname <- function(key,
     }
     else {
       if (length(hit) > 1) {
-        if (!quiet) cli::cli_warn('"{k}" matched with multiple rows. Only the first is returned. For more control over matching, set `exact = TRUE`.')
+        if (!quiet) cli::cli_warn(
+          '"{k}" matched with multiple rows. Only the first is returned. For
+          more control over matching, set `exact = TRUE`.'
+        )
       }
       out <- c(out, hit[1])
     }
