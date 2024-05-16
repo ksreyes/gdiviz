@@ -4,15 +4,23 @@
 \alias{check_data}
 \title{Check available data for country}
 \usage{
-check_data(country)
+check_data(iso, verbose = FALSE)
 }
 \arguments{
-\item{country}{3-letter ISO code of country of interest.}
+\item{iso}{3-letter ISO code of country of interest.}
+
+\item{verbose}{Whether to show all details.}
 }
 \value{
 Tibble.
 }
 \description{
-Display the variables and years for which data is available for a given
-country.
+Display the variables and years for which data is available for
+a given country.
+}
+\details{
+Table of results shows variable name, the earliest and latest dates
+available, the number of observations in the time series, and the
+date of last update. If \code{verbose = TRUE}, additionally shows the \code{table}
+and \code{var} names of the variables.
 }
