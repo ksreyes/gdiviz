@@ -4,26 +4,57 @@
 \alias{countryname}
 \title{Toggle between country names and ISO codes}
 \usage{
-countryname(key, from = "iso3c", to = "name")
+countryname(key, from = "iso3c", to = "name", exact = FALSE, quiet = FALSE)
 }
 \arguments{
-\item{key}{Name or ISO code of country.}
+\item{key}{(Case-insensitive) name or ISO code of country.}
 
 \item{from}{Current type of \code{key}.}
 
 \item{to}{Target type of \code{key}.}
+
+\item{exact}{Whether to use exact matching.}
+
+\item{quiet}{Turn off warning messages.}
 }
 \value{
 String or vector of strings.
 }
 \description{
-See \code{countrynames} table for full dictionary.
+Easily convert a country name to its ISO code and vice versa.
+Official United Nations country names are used. See \code{countrynames} for full
+dictionary.
+}
+\details{
+Under the default \code{exact = FALSE}, matching is done using
+\code{stringr::str_detect}, which means keys need not be exact. For example,
+\verb{countryname("iran", from = "name", to = "iso3c)} will return the correct
+ISO code "IRN" even if the dictionary name is "Islamic Republic of Iran".
+One can therefore check a country's official name by running
+\code{countryname("iran", from = "name")}.
+
+If there are multiple matches, \code{countryname()} will only return the first
+match. Thus, while "guinea" matches with four countries (Equatorial Guinea,
+Guinea, Guinea-Bissau, Papua New Guinea), \code{countryname("guinea")} will only
+return the keys for Equatorial Guinea, which is a problem if one wants to
+obtain the keys for Guinea. Set \code{exact = TRUE} to use exact matching.
+
+Regardless of how \code{exact} is set, matching remains case-insensitive,
 }
 \examples{
-countryname("DEU")
-# Germany
+countryname("deu")
+# "Germany"
 
-countryname("Germany", from = "unname", to = "iso3c")
-# DEU
+countryname("germany", from = "name", to = "iso3c")
+# "DEU"
+
+countryname("guinea", from = "name")
+# "Equatorial Guinea"
+
+countryname("guinea", from = "name", exact = TRUE)
+# "Guinea"
+
+countryname("united kingdom", from = "name")
+# "United Kingdom of Great Britain and Northern Ireland"
 
 }
