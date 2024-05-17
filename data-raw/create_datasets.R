@@ -193,10 +193,13 @@ idmc_geo <- readr::read_csv(stringr::str_glue("data-raw/{file}")) |>
   ) |>
   arrange(iso, category, type, t)
 
+groupings <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "groupings")
+
 captions <- readr::read_csv("data-raw/captions.csv")
 
 usethis::use_data(
   idmc_geo,
+  groupings,
   captions,
   internal = TRUE,
   overwrite = TRUE
