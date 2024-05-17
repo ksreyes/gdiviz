@@ -22,28 +22,30 @@ devtools::install_github("ksreyes/gdiviz")
 ## Getting started
 
 The key function of this package is `gdiplot()`, which generates a
-`ggplot` chart. It requires two arguments: `code`, which determines the
-variable and chart type to be created, and `country`, which is the
-3-letter ISO code of the country to chart.
+`ggplot` chart from a list of chart templates. It requires two
+arguments: `code`, which determines the variable and chart type to be
+created, and `country`, which is the 3-letter ISO code of the country to
+chart.
 
 ``` r
 library(gdiviz)
 gdiplot(code = "stocks", country = "DEU")
 ```
 
-![](inst/images/stocks_DEU.png)
+<img src="inst/images/stocks_DEU.png" style="width:90.0%" />
 
 ``` r
 gdiplot(code = "popmap", country = "DEU")
 ```
 
-![](inst/images/popmap_DEU.png)
+<img src="inst/images/popmap_DEU.png" style="width:90.0%" />
 
 ``` r
 gdiplot(code = "idp", country = "DEU")
 ```
 
-![](inst/images/idp_DEU.png)
+<img src="inst/images/idp_DEU.png" style="width:90.0%"
+data-fig-align="center" />
 
 To see the list of available charts and their respective codes, run
 `gdiplots`. Charts can be exported as SVG or PNG files with the `export`
@@ -69,6 +71,7 @@ The function `apply_theme()` can be used to apply IOM theming to any
 ``` r
 library(ggplot2)
 library(gdiviz)
+
 iris |>
   dplyr::summarise(Sepal.Length = mean(Sepal.Length), .by = Species) |>
   ggplot(aes(x = Species, y = Sepal.Length)) +
@@ -77,9 +80,10 @@ iris |>
   apply_theme("bar-vertical")
 ```
 
-![](inst/images/irischart.png) Default sizes are optimized for export as
-an image with width 12 cm at 300 dpi. IOM color palettes are also
-available using `pal()`. See function documentation for details.
+<img src="inst/images/irischart.png" style="width:90.0%" /> Default
+sizes are optimized for export as an image with width 12 cm at 300 dpi.
+IOM color palettes are also available using `pal()`. See function
+documentation for details.
 
 ## Disclaimer
 
