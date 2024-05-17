@@ -32,20 +32,19 @@ library(gdiviz)
 gdiplot(code = "stocks", country = "DEU")
 ```
 
-<img src="inst/images/stocks_DEU.png" width="500" />
+<img src="inst/images/stocks_DEU.png" width="550" />
 
 ``` r
 gdiplot(code = "popmap", country = "DEU")
 ```
 
-<img src="inst/images/popmap_DEU.png" style="width:90.0%" />
+<img src="inst/images/popmap_DEU.png" width="550" />
 
 ``` r
 gdiplot(code = "idp", country = "DEU")
 ```
 
-<img src="inst/images/idp_DEU.png" style="width:90.0%"
-data-fig-align="center" />
+<img src="inst/images/idp_DEU.png" width="550" />
 
 To see the list of available charts and their respective codes, run
 `gdiplots`. Charts can be exported as SVG or PNG files with the `export`
@@ -80,10 +79,10 @@ iris |>
   apply_theme("bar-vertical")
 ```
 
-<img src="inst/images/irischart.png" style="width:90.0%" /> Default
-sizes are optimized for export as an image with width 12 cm at 300 dpi.
-IOM color palettes are also available using `pal()`. See function
-documentation for details.
+<img src="inst/images/irischart.png" width="550" /> Default sizes are
+optimized for export as an image with width 12 cm at 300 dpi. IOM color
+palettes are also available using `pal()`. See function documentation
+for details.
 
 ## Disclaimer
 
