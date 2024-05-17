@@ -38,7 +38,7 @@ library(gdiviz)
 gdiplot(code = "stocks", country = "DEU")
 ```
 
-![](inst/images/stocks_DEU.png){width=90%}
+![](inst/images/stocks_DEU.png){width=500}
 ```r
 gdiplot(code = "popmap", country = "DEU")
 ```
