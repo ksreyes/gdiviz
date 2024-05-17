@@ -3,9 +3,13 @@
 \docType{data}
 \name{wpp}
 \alias{wpp}
-\title{Population by sex and age dataset}
+\title{Dataset of population by sex and age}
 \format{
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 637200 rows and 5 columns.
+}
+\source{
+United Nations Department of Economic and Social Affairs World
+Population Prospects (https://population.un.org/wpp/Download/Standard/CSV/)
 }
 \usage{
 wpp

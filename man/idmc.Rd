@@ -3,15 +3,18 @@
 \docType{data}
 \name{idmc}
 \alias{idmc}
-\title{Internally displaced persons dataset}
+\title{Internal displacements dataset}
 \format{
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 4064 rows and 4 columns.
+}
+\source{
+Internal Displacement Monitoring Centre
+(https://www.internal-displacement.org/database/displacement-data/)
 }
 \usage{
 idmc
 }
 \description{
-Flow count of internally displaced persons by the Internal Displacement
-Monitoring Centre.
+Flow count of internally displaced persons, by cause of displacement.
 }
 \keyword{datasets}

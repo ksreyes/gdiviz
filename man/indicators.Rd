@@ -3,7 +3,7 @@
 \docType{data}
 \name{indicators}
 \alias{indicators}
-\title{Indicators dataset}
+\title{Dataset of country indicators}
 \format{
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 76614 rows and 4 columns.
 }
@@ -11,7 +11,7 @@ An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) w
 indicators
 }
 \description{
-\code{R} dataset containing cross-country time series on the following variables:
+Dataset of country-level time series of the following variables:
 \itemize{
 \item Birth rate
 \item Age dependency ratio

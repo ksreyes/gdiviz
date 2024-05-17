@@ -1,7 +1,7 @@
-#' Indicators dataset
+#' Dataset of country indicators
 #'
 #' @description
-#' `R` dataset containing cross-country time series on the following variables:
+#' Dataset of country-level time series of the following variables:
 #' \itemize{
 #'   \item Birth rate
 #'   \item Age dependency ratio

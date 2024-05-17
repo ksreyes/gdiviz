@@ -3,16 +3,26 @@
 \docType{data}
 \name{stocks}
 \alias{stocks}
-\title{Migrant stocks dataset}
+\title{International migrant stocks dataset}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 255927 rows and 5 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 150570 rows and 5 columns.
+}
+\source{
+United Nations Department of Economic and Social Affairs
+(https://www.un.org/development/desa/pd/content/international-migrant-stock)
 }
 \usage{
 stocks
 }
 \description{
 \code{R} dataset containing stocks of migrants by country-pairs at
-5-year intervals from 1990 to 2020, disaggregated by sex. Run \code{gdidata} for
-more information.
+5-year intervals from 1990 to 2020, disaggregated by sex.
+}
+\details{
+\itemize{
+\item "XXX" in the \code{from} column denotes "Others".
+\item Kosovo is included in Serbia.
+\item Guernsey and Jersey are together reported as Channel Islands (CHI).
+}
 }
 \keyword{datasets}

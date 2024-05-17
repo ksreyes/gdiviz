@@ -24,24 +24,6 @@ usethis::use_data(gdidata, overwrite = TRUE)
 gdiplots <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "plots")
 usethis::use_data(gdiplots, overwrite = TRUE)
 
-# Stocks ------------------------------------------------------------------
-
-stocks <- dplyr::bind_rows(
-  readr::read_csv("data-raw/raw/Stocks_total.csv") |>
-    pivot_years() |>
-    dplyr::mutate(sex = "Total"),
-  readr::read_csv("data-raw/raw/Stocks_female.csv") |>
-    pivot_years() |>
-    dplyr::mutate(sex = "Female"),
-  readr::read_csv("data-raw/raw/Stocks_male.csv") |>
-    pivot_years() |>
-    dplyr::mutate(sex = "Male")
-) |>
-  dplyr::select(from = orig, to = dest, sex, t, v) |>
-  dplyr::arrange(from, to, sex, t)
-
-usethis::use_data(stocks, overwrite = TRUE)
-
 # Biophysical disruptions -------------------------------------------------
 
 wrangle_disrupt <- function(category_code, category) {
@@ -154,7 +136,7 @@ usethis::use_data(wpp, overwrite = TRUE)
 
 # MPP ---------------------------------------------------------------------
 
-mpp <- readr::read_csv("data-raw/Missing_Migrants_Global_Figures_allData.csv") |>
+mmp <- readr::read_csv("data-raw/Missing_Migrants_Global_Figures_allData.csv") |>
   mutate(
     location = countrycode::countrycode(
       `Country of Incident`,
@@ -175,11 +157,13 @@ mpp <- readr::read_csv("data-raw/Missing_Migrants_Global_Figures_allData.csv") |
     Dead = `Number of Dead`,
     Missing = `Minimum Estimated Number of Missing`
   ) |>
-  pivot_longer(cols = c("Dead", "Missing"), names_to = "type", values_to = "v") |>
+  pivot_longer(
+    cols = c("Dead", "Missing"), names_to = "count", values_to = "v"
+  ) |>
   drop_na(v) |>
   filter(v > 0)
 
-usethis::use_data(mpp, overwrite = TRUE)
+usethis::use_data(mmp, overwrite = TRUE)
 
 # Internal ----------------------------------------------------------------
 
