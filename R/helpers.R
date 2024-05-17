@@ -22,14 +22,18 @@ get_avgs <- function(data, hero, world = TRUE) {
   if (nrow(data_iso) > 0) {
 
     weights <- dplyr::bind_rows(
+
       dplyr::filter(stocks, .data$from == hero) |>
+        dplyr::summarise(v = sum(.data$v), .by = c(.data$to, .data$t)) |>
         dplyr::mutate(
           share = .data$v / sum(.data$v),
           type = "Destin",
           .by = .data$t
         ) |>
         dplyr::select(.data$type, .data$t, iso = .data$to, .data$share),
+
       dplyr::filter(stocks, .data$to == hero) |>
+        dplyr::summarise(v = sum(.data$v), .by = c(.data$from, .data$t)) |>
         dplyr::mutate(
           share = .data$v / sum(.data$v),
           type = "Origin",

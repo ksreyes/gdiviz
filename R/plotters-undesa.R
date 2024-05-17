@@ -20,12 +20,12 @@ plot_stocks <- function(hero,
   # Data
   df <- dplyr::bind_rows(
     stocks |>
-      dplyr::filter(.data$from == hero & .data$sex == "Total") |>
+      dplyr::filter(.data$from == hero) |>
       dplyr::summarise(v = sum(.data$v), .by = c(.data$from, .data$t)) |>
       dplyr::mutate(type = "Emigrants") |>
       dplyr::rename(iso = .data$from),
     stocks |>
-      dplyr::filter(.data$to == hero & .data$sex == "Total") |>
+      dplyr::filter(.data$to == hero) |>
       dplyr::summarise(v = sum(.data$v), .by = c(.data$to, .data$t)) |>
       dplyr::mutate(type = "Immigrants") |>
       dplyr::rename(iso = .data$to)
@@ -159,11 +159,7 @@ plot_srat <- function(hero,
   # Data
   df <- dplyr::bind_rows(
     stocks |>
-      dplyr::filter(
-        .data$from == hero &
-          .data$sex != "Total" &
-          .data$t == max(.data$t)
-      ) |>
+      dplyr::filter(.data$from == hero & .data$t == max(.data$t)) |>
       dplyr::summarise(
         v = sum(.data$v),
         .by = c(.data$from, .data$sex, .data$t)
@@ -171,11 +167,7 @@ plot_srat <- function(hero,
       dplyr::mutate(type = "Emigrants") |>
       dplyr::rename(iso = .data$from),
     stocks |>
-      dplyr::filter(
-        .data$to == hero &
-          .data$sex != "Total" &
-          .data$t == max(.data$t)
-      ) |>
+      dplyr::filter(.data$to == hero & .data$t == max(.data$t)) |>
       dplyr::summarise(
         v = sum(.data$v),
         .by = c(.data$to, .data$sex, .data$t)
@@ -294,9 +286,8 @@ plot_dest <- function(hero,
 
   # Data
   df <- stocks |>
-    dplyr::filter(
-      .data$from == hero & .data$sex == "Total" & .data$t == max(.data$t)
-    )
+    dplyr::filter(.data$from == hero & .data$t == max(.data$t)) |>
+    dplyr::summarise(v = sum(.data$v), .by = c(.data$from, .data$to, .data$t))
 
   if (nrow(df) > 0) {
 
@@ -420,9 +411,8 @@ plot_orig <- function(hero,
 
   # Data
   df1 <- stocks |>
-    dplyr::filter(
-      .data$to == hero & .data$sex == "Total" & .data$t == max(.data$t)
-    )
+    dplyr::filter(.data$to == hero & .data$t == max(.data$t)) |>
+    dplyr::summarise(v = sum(.data$v), .by = c(.data$from, .data$to, .data$t))
 
   if (nrow(df1) > 0) {
 
@@ -434,7 +424,8 @@ plot_orig <- function(hero,
       dplyr::mutate(country = dplyr::case_when(
         .data$rank > threshold ~ "Others",
         .data$from == "XXX" ~ "Others",
-        nchar(countryname(.data$from)) <= name_maxchar ~ countryname(.data$from),
+        nchar(countryname(.data$from, quiet = TRUE)) <=
+          name_maxchar ~ countryname(.data$from, quiet = TRUE),
         .default = .data$from
       )) |>
       dplyr::summarise(
