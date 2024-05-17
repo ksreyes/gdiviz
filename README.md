@@ -79,10 +79,11 @@ iris |>
   apply_theme("bar-vertical")
 ```
 
-<img src="inst/images/irischart.png" width="550" /> Default sizes are
-optimized for export as an image with width 12 cm at 300 dpi. IOM color
-palettes are also available using `pal()`. See function documentation
-for details.
+<img src="inst/images/irischart.png" width="550" />
+
+Default sizes are optimized for export as an image with width 12 cm at
+300 dpi. IOM color palettes are also available using `pal()`. See
+function documentation for details.
 
 ## Disclaimer
 
