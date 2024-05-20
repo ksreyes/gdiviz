@@ -6,13 +6,12 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
+*Under construction*
+
 This package is a collection of data and tools that allows for the easy
 production of charts.
 
 ## Installation
-
-You can install the development version of gdiviz from
-[GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
