@@ -165,7 +165,8 @@ mmp <- readr::read_csv("data-raw/Missing_Migrants_Global_Figures_allData.csv") |
 
 usethis::use_data(mmp, overwrite = TRUE)
 
-# Internal ----------------------------------------------------------------
+
+# IDMC geolocated ---------------------------------------------------------
 
 file <- "Displacements_geolocated.csv"
 idmc_geo <- readr::read_csv(stringr::str_glue("data-raw/{file}")) |>
@@ -192,6 +193,10 @@ idmc_geo <- readr::read_csv(stringr::str_glue("data-raw/{file}")) |>
     )
   ) |>
   arrange(iso, category, type, t)
+
+usethis::use_data(idmc_geo, overwrite = TRUE)
+
+# Internal ----------------------------------------------------------------
 
 groupings <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "groupings")
 
