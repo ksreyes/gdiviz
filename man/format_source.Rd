@@ -4,7 +4,7 @@
 \alias{format_source}
 \title{Format plot source in HTML}
 \usage{
-format_source(source, basesize = 8, space_after = TRUE)
+format_source(source, basesize = 8, space_after = TRUE, color = "#8099D0")
 }
 \arguments{
 \item{source}{String of the plot's source.}
@@ -12,6 +12,8 @@ format_source(source, basesize = 8, space_after = TRUE)
 \item{basesize}{Base text size of plot.}
 
 \item{space_after}{Whether to add line breaks after the source. Use when plot has a caption.}
+
+\item{color}{Text color.}
 }
 \value{
 String.
