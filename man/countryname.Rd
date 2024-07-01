@@ -42,8 +42,8 @@ obtain the keys for Guinea. Set \code{exact = TRUE} to use exact matching.
 Regardless of how \code{exact} is set, matching remains case-insensitive,
 }
 \examples{
-countryname("deu")
-# "Germany"
+countryname(c("deu", "phl"))
+# "Germany" "Philippines"
 
 countryname("germany", from = "name", to = "iso3c")
 # "DEU"

@@ -28,8 +28,8 @@
 #' @return String or vector of strings.
 #'
 #' @examples
-#' countryname("deu")
-#' # "Germany"
+#' countryname(c("deu", "phl"))
+#' # "Germany" "Philippines"
 #'
 #' countryname("germany", from = "name", to = "iso3c")
 #' # "DEU"
@@ -51,6 +51,7 @@ countryname <- function(key,
                         quiet = FALSE) {
 
   out <- c()
+  multi <- data.frame()
   nohits <- c()
 
   for (k in key) {
@@ -61,7 +62,10 @@ countryname <- function(key,
     if (exact) {
       row <- which(tolower(from_col) == tolower(k))
     } else {
-      row <- which(stringr::str_detect(tolower(from_col), tolower(k)))
+      row <- which(
+        stringr::str_detect(tolower(from_col),
+        paste0("\\b", tolower(k), "\\b"))
+      )
     }
     hit <- to_col[row]
 
@@ -71,19 +75,32 @@ countryname <- function(key,
     }
     else {
       if (length(hit) > 1) {
-        if (!quiet) cli::cli_warn(
-          '"{k}" matched with multiple rows. Only the first is returned. For
-          more control over matching, set `exact = TRUE`.'
-        )
+        multi <- multi |>
+          rbind(data.frame(
+            key = paste0('"', k, '"'),
+            hit = paste0('"', hit[1], '"')
+          ))
       }
       out <- c(out, hit[1])
     }
   }
 
+  if (!quiet & nrow(multi) > 0) {
+    multi <- multi |> dplyr::distinct(key, .keep_all = TRUE)
+    warn <- c()
+    for (row in 1:nrow(multi)) {
+      warn <- c(warn, "*" = paste0(multi$key[row], " = ", multi$hit[row]))
+    }
+    cli::cli_warn(c(
+      'The following had multiple matches and only the first was returned. For more control over matching, set `exact = TRUE`.',
+      warn
+    ))
+  }
+
   if (length(nohits) > 0) {
     if (!quiet) cli::cli_warn(c(
       'Unable to parse the following (returned NA) :',
-      "*" = '{paste(nohits, collapse = ", ")}'
+      "*" = '{paste(unique(nohits), collapse = ", ")}'
     ))
   }
 
