@@ -4,7 +4,7 @@
 \alias{grab_plot_data}
 \title{Grab data behind a preset plot}
 \usage{
-grab_plot_data(plot_key, iso, years = FALSE, year_max = FALSE)
+grab_plot_data(plot_key, iso, years = FALSE, year_max = FALSE, print = FALSE)
 }
 \arguments{
 \item{plot_key}{Plot key.}
@@ -16,7 +16,13 @@ grab_plot_data(plot_key, iso, years = FALSE, year_max = FALSE)
 
 \item{year_max}{If \code{TRUE}, returns the maximum year of the data
 (default\verb{=FALSE}).}
+
+\item{print}{If \code{TRUE}, returns the dataset formatted for printing.}
 }
 \description{
 Grab data behind a preset plot
+}
+\examples{
+grab_plot_data("stocks", "DEU")
+
 }
