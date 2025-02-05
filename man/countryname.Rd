@@ -4,7 +4,7 @@
 \alias{countryname}
 \title{Toggle between country names and ISO codes}
 \usage{
-countryname(key, from = "iso3c", to = "name", exact = FALSE, quiet = FALSE)
+countryname(key, from = "iso3", to = "name", exact = FALSE, quiet = FALSE)
 }
 \arguments{
 \item{key}{(Case-insensitive) name or ISO code of country.}
@@ -28,7 +28,7 @@ dictionary.
 \details{
 Under the default \code{exact = FALSE}, matching is done using
 \code{stringr::str_detect}, which means keys need not be exact. For example,
-\verb{countryname("iran", from = "name", to = "iso3c)} will return the correct
+\verb{countryname("iran", from = "name", to = "iso3)} will return the correct
 ISO code "IRN" even if the dictionary name is "Islamic Republic of Iran".
 One can therefore check a country's official name by running
 \code{countryname("iran", from = "name")}.
@@ -45,7 +45,7 @@ Regardless of how \code{exact} is set, matching remains case-insensitive,
 countryname(c("deu", "phl"))
 # "Germany" "Philippines"
 
-countryname("germany", from = "name", to = "iso3c")
+countryname("germany", from = "name", to = "iso3")
 # "DEU"
 
 countryname("guinea", from = "name")
