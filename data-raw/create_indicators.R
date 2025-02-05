@@ -6,7 +6,7 @@ library(tidyverse)
 wbcountries <- read_csv("data-raw/Metadata_Country.csv") |>
   select(`Country Code`, Region, TableName) |>
   drop_na() |>
-  full_join(countrynames, by = c("Country Code" = "iso3c")) |>
+  full_join(countrynames, by = c("Country Code" = "iso3")) |>
   select(`Country Code`, TableName) |>
   drop_na() |>
   pull(`Country Code`) |>
@@ -32,15 +32,21 @@ build_url <- function(code) {
   paste0(
     "http://api.worldbank.org/v2/country/",
     wbcountries,
+    # "nor",
     "/indicator/",
     code,
     "?format=json&date=1990:2050&per_page=9999"
   )
 }
 
+library(httr)
+url <- build_url("SP.POP.TOTL")
+response <- GET("http://api.worldbank.org/v2/country/nor/indicator/SP.POP.TOTL?format=json")
+status_code(response)
+
 wdi <- tibble()
 
-for (i in 1:nrow(wdi_codes)) {
+for (i in 2:nrow(wdi_codes)) {
 
   wdi_i <- jsonlite::fromJSON(build_url(wdi_codes$code[i])) |>
     as.data.frame() |>
