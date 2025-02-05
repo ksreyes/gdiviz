@@ -6,7 +6,7 @@
 #'
 #' @details Under the default `exact = FALSE`, matching is done using
 #'   `stringr::str_detect`, which means keys need not be exact. For example,
-#'   `countryname("iran", from = "name", to = "iso3c)` will return the correct
+#'   `countryname("iran", from = "name", to = "iso3)` will return the correct
 #'   ISO code "IRN" even if the dictionary name is "Islamic Republic of Iran".
 #'   One can therefore check a country's official name by running
 #'   `countryname("iran", from = "name")`.
@@ -31,7 +31,7 @@
 #' countryname(c("deu", "phl"))
 #' # "Germany" "Philippines"
 #'
-#' countryname("germany", from = "name", to = "iso3c")
+#' countryname("germany", from = "name", to = "iso3")
 #' # "DEU"
 #'
 #' countryname("guinea", from = "name")
@@ -45,10 +45,31 @@
 #'
 #' @export
 countryname <- function(key,
-                        from = "iso3c",
+                        from = "iso3",
                         to = "name",
                         exact = FALSE,
                         quiet = FALSE) {
+
+  # Check if types are valid
+  valid_types <- colnames(countrynames)
+  if(!all(c(from, to) %in% valid_types)) {
+    invalid <- c()
+    if (!(from %in% valid_types)) {
+      invalid <- c(invalid, paste0('"', from, '"'))
+    }
+    if (!(to %in% valid_types)) {
+      invalid <- c(invalid, paste0('"', to, '"'))
+    }
+    if (length(invalid) > 1) {
+      invalid <- paste(
+        paste(invalid, collapse = " and "),
+        "are not valid types."
+      )
+    } else {
+      invalid <- paste(invalid, "is not a valid type.")
+    }
+    cli::cli_abort("{invalid}")
+  }
 
   out <- c()
   multi <- data.frame()

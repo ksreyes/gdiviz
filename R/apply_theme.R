@@ -34,7 +34,11 @@ apply_theme <- function(type, basesize = 8, facets = FALSE) {
 
   base <- list(
     ggplot2::theme(
-      text = ggplot2::element_text(color = pal("blues")),
+      # text = ggplot2::element_text(color = pal("blues")),
+      text = ggplot2::element_text(
+        family = "Gill Sans Nova",
+        color = pal("blues")
+      ),
 
       axis.title = ggplot2::element_blank(),
       axis.text = ggplot2::element_text(size = size$text, color = pal("blues")),
@@ -56,21 +60,35 @@ apply_theme <- function(type, basesize = 8, facets = FALSE) {
       panel.grid.minor = ggplot2::element_blank(),
 
       plot.background = ggplot2::element_blank(),
-      plot.title = ggtext::element_markdown(
-        size = size$title,
+      # plot.title = ggtext::element_markdown(
+      #   size = size$title,
+      #   face = "bold",
+      #   hjust = .5,
+      #   margin = ggplot2::margin(b = k(3.5))
+      # ),
+      plot.title = ggplot2::element_text(
         face = "bold",
+        size = size$title,
         hjust = .5,
         margin = ggplot2::margin(b = k(3.5))
       ),
       plot.title.position = "plot",
-      plot.caption = ggtext::element_markdown(
+      # plot.caption = ggtext::element_markdown(
+      #   size = size$text,
+      #   hjust = 0,
+      #   lineheight = 1.2,
+      #   margin = ggplot2::margin(t = k(3.5), r = k(1), l = k(1))
+      # ),
+      plot.caption = ggplot2::element_text(
+        face = "italic",
+        color = pal("blues", 3),
         size = size$text,
         hjust = 0,
         lineheight = 1.2,
         margin = ggplot2::margin(t = k(3.5), r = k(1), l = k(1))
       ),
       plot.caption.position = "plot",
-      plot.margin = ggplot2::margin(k(5), k(3), k(5), k(3))
+      plot.margin = ggplot2::margin(k(4), k(4), k(4), k(4))
     ))
 
   if (type == "void") {
@@ -131,6 +149,19 @@ apply_theme <- function(type, basesize = 8, facets = FALSE) {
         ),
       ))
     theme <- c(base, theme_line)
+  }
+
+  if (type == "scatter") {
+
+    theme_scat <- list(
+      ggplot2::theme(
+        legend.key.size = bar_key_size,
+        panel.grid.major = ggplot2::element_line(
+          linewidth = panel_grid_width,
+          color = panel_grid_color
+        ),
+      ))
+    theme <- c(base, theme_scat)
   }
 
   if (type == "map") {
