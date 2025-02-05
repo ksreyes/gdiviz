@@ -14,7 +14,7 @@ pivot_years <- function(data) {
 
 # Metadata ----------------------------------------------------------------
 
-countrynames <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "countries")
+countrynames <- readxl::read_excel("data-raw/countrynames.xlsx")
 usethis::use_data(countrynames, overwrite = TRUE)
 
 gdidata <- readxl::read_excel("data-raw/metadata.xlsx", sheet = "datasets") |>
