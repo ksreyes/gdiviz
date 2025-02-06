@@ -1,7 +1,4 @@
 
-library(tidyverse)
-
-
 namer <- function(iso) {
   name_iso <- dplyr::filter(countrynames, .data$iso3 == iso)
   if (name_iso$with_the == 1) name <- paste0("the ", name_iso$name_text)
