@@ -9,8 +9,6 @@
 #'   (default`=FALSE`).
 #' @param print If `TRUE`, returns the dataset formatted for printing.
 #'
-#' @examples grab_plot_data("stocks", "DEU")
-#'
 #' @export
 grab_plot_data <- function(plot_key,
                            iso,

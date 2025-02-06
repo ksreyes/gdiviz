@@ -22,7 +22,3 @@ grab_plot_data(plot_key, iso, years = FALSE, year_max = FALSE, print = FALSE)
 \description{
 Grab data behind a preset plot
 }
-\examples{
-grab_plot_data("stocks", "DEU")
-
-}

@@ -1,6 +1,7 @@
 
 library(tidyverse)
 
+
 namer <- function(iso) {
   name_iso <- dplyr::filter(countrynames, .data$iso3 == iso)
   if (name_iso$with_the == 1) name <- paste0("the ", name_iso$name_text)
@@ -75,7 +76,7 @@ plot_migstocks <- function(hero,
                              )
                            ) {
 
-  k <- function(factor = 1) factor * basesize / .pt
+  k <- function(factor = 1) factor * basesize / ggplot2::.pt
   source <- "Source: UN DESA."
   name <- namer(hero)
 
@@ -100,15 +101,15 @@ plot_migstocks <- function(hero,
     ))
 
   plot_elements <- list(
-    geom_area(stat = "identity"),
-    facet_wrap(~panel),
-    labs(title = title, caption = source),
-    scale_x_continuous(
+    ggplot2::geom_area(stat = "identity"),
+    ggplot2::facet_wrap(~.data$panel),
+    ggplot2::labs(title = title, caption = source),
+    ggplot2::scale_x_continuous(
       breaks = seq(1990, 2020, 10),
-      expand = expansion(mult = .05),
-      guide = guide_axis(minor.ticks = TRUE)
+      expand = ggplot2::expansion(mult = .05),
+      guide = ggplot2::guide_axis(minor.ticks = TRUE)
     ),
-    scale_fill_manual(values = c(
+    ggplot2::scale_fill_manual(values = c(
       "Africa" = pal("blues", 2),
       "Americas" = pal("greens"),
       "Asia" = pal("reds", 2),
@@ -117,18 +118,20 @@ plot_migstocks <- function(hero,
       "Unknown" = pal("grays", 3)
     )),
     apply_theme("bar-vertical", basesize, facets = TRUE),
-    theme(
-      axis.title.y = element_text(
+    ggplot2::theme(
+      axis.title.y = ggplot2::element_text(
         size = basesize,
-        margin = margin(r = k(2))
+        margin = ggplot2::margin(r = k(2))
       ),
-      axis.ticks.x = element_line(color = pal("blues"), linewidth = k(.05)),
+      axis.ticks.x = ggplot2::element_line(
+        color = pal("blues"),
+        linewidth = k(.05)),
       legend.position = "right",
-      panel.spacing.x = unit(k(.5), "lines"),
-      plot.margin = margin(k(2), 0, k(2), k(2)),
-      strip.text = element_text(
+      panel.spacing.x = grid::unit(k(.5), "lines"),
+      plot.margin = ggplot2::margin(k(2), 0, k(2), k(2)),
+      strip.text = ggplot2::element_text(
         size = basesize,
-        margin = margin(t = 0, b = k())
+        margin = ggplot2::margin(t = 0, b = k())
       )
     )
   )
@@ -139,13 +142,13 @@ plot_migstocks <- function(hero,
       summarise(n = sum(n, na.rm = TRUE), .by = c(panel, t))
     max_n <- max(check_max$n)
 
-    set_breaks <- waiver()
+    set_breaks <- ggplot2::waiver()
     set_labels <- function(x) x / 10^6
     set_ytitle <- "Millions of individuals"
 
     if (max_n < 1200) {
       set_ytitle <- "Individuals"
-      set_labels <- waiver()
+      set_labels <- ggplot2::waiver()
     }
     if (max_n >= 1200 & max_n < 1.20 * 10^6) {
       set_ytitle <- "Thousands of individuals"
@@ -161,44 +164,49 @@ plot_migstocks <- function(hero,
     }
 
     df <- df |>
-      complete(
+      tidyr::complete(
         region = regions,
         t = timespan,
         panel,
         fill = list(n = 0)
       )
 
-    plot <- ggplot(df, aes(x = t, y = n, group = region, fill = region)) +
+    plot <- ggplot2::ggplot(
+      df,
+      ggplot2::aes(x = .data$t, y = n, group = .data$region, fill = .data$region)
+    ) +
       plot_elements +
-      scale_y_continuous(
+      ggplot2::scale_y_continuous(
         name = set_ytitle,
         breaks = set_breaks,
         labels = set_labels,
-        expand = expansion(mult = c(0, .025))
+        expand = ggplot2::expansion(mult = c(0, .025))
       )
 
   } else {
 
     df <- df |>
-      complete(
+      tidyr::complete(
         region = regions,
         t = timespan,
         panel = c(panel_emig, panel_immig),
         fill = list(n = 0)
       )
 
-    plot <- ggplot(df, aes(x = t, y = n, group = region, fill = region)) +
+    plot <- ggplot2::ggplot(
+      df,
+      ggplot2::aes(x = .data$t, y = .data$n, group = .data$region, fill = .data$region)) +
       plot_elements +
-      theme(axis.text.y = element_blank())
+      ggplot2::theme(axis.text.y = ggplot2::element_blank())
 
-    plot <- ggdraw(plot) +
-      draw_label(
+    plot <- cowplot::ggdraw(plot) +
+      cowplot::draw_label(
         "No data", x = .2240, y = .5,
         fontfamily = "Gill Sans Nova",
         color = pal("blues", 3),
         size = k(3)
       ) +
-      draw_label(
+      cowplot::draw_label(
         "No data", x = .6575, y = .5,
         fontfamily = "Gill Sans Nova",
         color = pal("blues", 3),
@@ -227,31 +235,31 @@ plot_nats <- function(hero,
   if (nrow(df) > 0) {
 
     df <- df |>
-      mutate(country = case_when(
-        country == breakers$from[1] ~ breakers$to[1],
-        country == breakers$from[2] ~ breakers$to[2],
-        country == breakers$from[3] ~ breakers$to[3],
-        country == breakers$from[4] ~ breakers$to[4],
-        country == breakers$from[5] ~ breakers$to[5],
-        country == breakers$from[6] ~ breakers$to[6],
-        country == breakers$from[7] ~ breakers$to[7],
-        country == breakers$from[8] ~ breakers$to[8],
-        .default = country
+      dplyr::mutate(country = dplyr::case_when(
+        .data$country == breakers$from[1] ~ breakers$to[1],
+        .data$country == breakers$from[2] ~ breakers$to[2],
+        .data$country == breakers$from[3] ~ breakers$to[3],
+        .data$country == breakers$from[4] ~ breakers$to[4],
+        .data$country == breakers$from[5] ~ breakers$to[5],
+        .data$country == breakers$from[6] ~ breakers$to[6],
+        .data$country == breakers$from[7] ~ breakers$to[7],
+        .data$country == breakers$from[8] ~ breakers$to[8],
+        .default = .data$country
       ))
 
-    df_destin <- filter(df, str_detect(panel, "Destinations"))
-    df_origin <- filter(df, str_detect(panel, "Origins"))
+    df_destin <- dplyr::filter(df, str_detect(.data$panel, "Destinations"))
+    df_origin <- dplyr::filter(df, str_detect(.data$panel, "Origins"))
 
     df_destin$country <- factor(df_destin$country, levels = df_destin$country)
     df_origin$country <- factor(df_origin$country, levels = df_origin$country)
 
     scales <- list(
-      scale_x_continuous(
+      ggplot2::scale_x_continuous(
         labels = function(x) prettylabel(x, pct = TRUE),
-        expand = expansion(mult = c(.02, .15))
+        expand = ggplot2::expansion(mult = c(.02, .15))
       ),
-      scale_y_discrete(expand = expansion(mult = .15)),
-      scale_fill_manual(values = c(
+      ggplot2::scale_y_discrete(expand = ggplot2::expansion(mult = .15)),
+      ggplot2::scale_fill_manual(values = c(
         "Africa"   = pal("blues", 2),
         "Americas" = pal("greens"),
         "Asia"     = pal("reds", 2),
@@ -259,7 +267,7 @@ plot_nats <- function(hero,
         "Oceania"  = pal("unblues", 2),
         "Others"   = pal("grays", 4)
       )),
-      scale_color_manual(values = c(
+      ggplot2::scale_color_manual(values = c(
         "Africa"   = pal("blues"),
         "Americas" = pal("greens"),
         "Asia"     = pal("reds"),
@@ -269,10 +277,16 @@ plot_nats <- function(hero,
       ))
     )
 
-    p_destin <- ggplot(df_destin, aes(x = share, y = country, fill = region)) +
-      geom_bar(stat = "identity", width = .7, show.legend = FALSE) +
-      geom_text(
-        mapping = aes(label = prettylabel(share, pct = TRUE), color = region),
+    p_destin <- ggplot2::ggplot(
+      df_destin,
+      ggplot2::aes(x = share, y = country, fill = region)
+    ) +
+      ggplot2::geom_bar(stat = "identity", width = .7, show.legend = FALSE) +
+      ggplot2::geom_text(
+        ggplot2::aes(
+          label = prettylabel(share, pct = TRUE),
+          color = region
+        ),
         size = k(),
         family = "Gill Sans Nova",
         fontface = "bold",
@@ -280,7 +294,7 @@ plot_nats <- function(hero,
         nudge_x = max(df_destin$share) / 30,
         show.legend = FALSE
       ) +
-      ggtitle("Destinations of emigrants") +
+      ggplot2::ggtitle("Destinations of emigrants") +
 
       scales +
 

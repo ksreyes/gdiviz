@@ -24,7 +24,3 @@ gdi_plot(plot_key, iso, basesize = 7, title, dims = FALSE)
 \description{
 Generate a preset plot
 }
-\examples{
-gdi_plot("stocks", "DEU")
-
-}

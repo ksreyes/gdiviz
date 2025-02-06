@@ -10,8 +10,6 @@
 #'
 #' @returns `ggplot2` object.
 #'
-#' @examples gdi_plot("stocks", "DEU")
-#'
 #' @export
 gdi_plot <- function(plot_key,
                      iso,
