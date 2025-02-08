@@ -18,44 +18,39 @@ gdi_plot <- function(key,
                      font = "Open Sans",
                      ...) {
 
-  plots <- list(
+  keys <- list(
     "stocks" = list(
-      "func" = plot_migstocks,
-      "meta" = list(dims = c(16, 7))
+      "dims" = c(16, 7)
     ),
     "nats" = list(
-      "func" = plot_nats,
-      "meta" = list(dims = c(16, 7))
+      "dims" = c(16, 7)
     ),
     "nmig" = list(
-      "func" = plot_nmig,
-      "meta" = list(dims = c(8, 7))
+      "dims" = c(8, 7)
     ),
     "idp" = list(
-      "func" = plot_idp,
-      "meta" = list(dims = c(8, 7))
+      "dims" = c(8, 7)
+    ),
+    "mmp" = list(
+      "dims" = c(8, 7)
+    ),
+    "refug" = list(
+      "dims" = c(16, 7)
     )
   )
 
-  if (key %in% names(plot_list)) {
+  if (key %in% names(keys)) {
 
     if (!is.null(iso)) {
 
       if (iso %in% countrynames$iso3) {
 
-        return(plots[[key]]$func(iso, basesize, font, ...))
+        plotter <- match.fun(paste0("plot_", key))
+        return(plotter(iso, basesize, font, ...))
 
-      } else {
+      } else cli::cli_abort("{iso} is not a valid ISO3 code.")
 
-        cli::cli_abort("{iso} is not a valid ISO3 code.")
-
-      }
-
-    } else {
-
-      return(plots[[key]]$meta)
-
-    }
+    } else return(keys[[key]])
 
   } else cli::cli_abort("{key} is not a valid plot key.")
 
