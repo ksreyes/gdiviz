@@ -4,13 +4,15 @@
 \alias{apply_theme}
 \title{Apply IOM theme to a plot}
 \usage{
-apply_theme(type, basesize = 8, facets = FALSE)
+apply_theme(type, basesize = 8, font = "Open Sans", facets = FALSE)
 }
 \arguments{
 \item{type}{What type of plot is being themed? Accepts "line",
 "bar-horizontal", "bar-vertical", "map", and "void".}
 
 \item{basesize}{Font size in points. Default is 10.}
+
+\item{font}{Font family. Default is Open Sans.}
 
 \item{facets}{Is this a faceted plot?}
 }
