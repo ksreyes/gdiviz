@@ -1,211 +1,226 @@
 
 namer <- function(iso) {
-  name_iso <- dplyr::filter(countrynames, .data$iso3 == iso)
+  name_iso <- filter(countrynames, .data$iso3 == iso)
   if (name_iso$with_the == 1) name <- paste0("the ", name_iso$name_text)
   else name <- name_iso$name_text
   return(name)
 }
 
-breakers <- tibble::tribble(
-  ~from, ~to,
-  "Plurinational State of Bolivia", "Plurinational State\nof Bolivia",
-  "China, Taiwan Province of China", "Taiwan Province of China",
-  "Democratic People's Republic of Korea", "Democratic People's Republic\nof Korea",
-  "Democratic Republic of the Congo", "Democratic Republic\nof the Congo",
-  "Lao People's Democratic Republic", "Lao People's Democratic\nRepublic",
-  "Federated States of Micronesia", "Federated States\nof Micronesia",
-  "Occupied Palestinian Territory", "Occupied Palestinian\nTerritory",
-  "Bolivarian Republic of Venezuela", "Bolivarian Republic\nof Venezuela"
-)
+break_lines <- function(column) {
 
-plot_empty <- function(title, source, time, basesize, msg = "No data") {
+  dict <- c(
+    "Plurinational State of Bolivia" =
+      "Plurinational State\nof Bolivia",
+    "China, Taiwan Province of China" =
+      "Taiwan Province\nof China",
+    "Democratic People's Republic of Korea" =
+      "Democratic People's Republic\nof Korea",
+    "Democratic Republic of the Congo" =
+      "Democratic Republic\nof the Congo",
+    "Lao People's Democratic Republic" =
+      "Lao People's Democratic\nRepublic",
+    "Federated States of Micronesia" =
+      "Federated States\nof Micronesia",
+    "Occupied Palestinian Territory" =
+      "Occupied Palestinian\nTerritory",
+    "Bolivarian Republic of Venezuela" =
+      "Bolivarian Republic\nof Venezuela"
+  )
 
+  indices <- which(column %in% names(dict))
+
+  new_col <- replace(
+    column,
+    indices,
+    dict[column[indices]]
+  )
+
+  return(new_col)
+}
+
+set_axis <- function(values, units = "Persons") {
+
+  max_n <- max(values)
+
+  output <- list(
+    breaks = waiver(),
+    labels = function(x) x / 10^6,
+    title = paste0("Millions of ", tolower(units))
+  )
+
+  if (max_n < 12) {
+    output$title <- units
+    output$breaks <- c(0, 5, 10)
+    output$labels <- waiver()
+  }
+  if (max_n >= 12 & max_n < 1200) {
+    output$title <- units
+    output$labels <- waiver()
+  }
+  if (max_n >= 1200 & max_n < 1.20 * 10^6) {
+    output$title <- paste0("Thousands of ", tolower(units))
+    output$labels <- function(x) x / 1000
+  }
+  if (max_n >= 1.20 * 10^6 & max_n < 1.40 * 10^6) {
+    output$breaks <- seq(0, 1.25 * 10^6, .25 * 10^6)
+    output$labels <- c("0", "0.25", "0.50", "0.75", "1", "1.25")
+  }
+  if (max_n >= 1.40 * 10^6 & max_n < 1.80 * 10^6) {
+    output$breaks <- seq(0, 1.50 * 10^6, .50 * 10^6)
+    output$labels <- c("0", "0.5", "1", "1.5")
+  }
+
+  return(output)
+}
+
+plot_empty <- function(title, source, time, basesize, font, msg = "No data") {
+
+  k <- function(factor = 1) factor * basesize / .pt
   time_minor <- time[time %% 5 == 0]
 
-  plot <- ggplot2::ggplot(
-    data.frame(t = time),
-    ggplot2::aes(x = .data$t)
-  ) +
-    ggplot2::labs(title = title, caption = source) +
-
-    ggplot2::scale_x_continuous(
+  plot <- ggplot(data.frame(t = time), aes(x = .data$t)) +
+    labs(title = title, caption = source) +
+    scale_x_continuous(
       minor_breaks = seq(min(time_minor), max(time_minor), 5),
-      expand = ggplot2::expansion(mult = .025),
-      guide = ggplot2::guide_axis(minor.ticks = TRUE)
+      expand = expansion(mult = .025),
+      guide = guide_axis(minor.ticks = TRUE)
     ) +
-    ggplot2::scale_y_continuous(
-      limits = c(0, 10),
-      breaks = 0,
-      expand = ggplot2::expansion(mult = 0)
-    ) +
-
-    apply_theme(type = "line", basesize) +
-    ggplot2::theme(
-      axis.text.y = ggplot2::element_blank(),
-      axis.ticks.x = ggplot2::element_line(
-        color = pal("blues"),
-        linewidth = k(.05)
-      ),
-      plot.margin = ggplot2::margin(k(2), k(2), k(2), k(2))
+    apply_theme(type = "line", basesize, font) +
+    theme(
+      axis.text.y = element_blank(),
+      panel.background = element_rect(color = NA, fill = pal("unblues", 5)),
+      plot.margin = margin(k(2), k(2), k(2), k(2))
     )
 
-  plot <- cowplot::ggdraw(plot) +
-    cowplot::draw_label(
+  plot <- ggdraw(plot) +
+    draw_label(
       msg,
-      y = .55,
-      fontfamily = "Gill Sans Nova",
-      color = pal("blues", 3),
-      size = k(3)
+      y = .55, fontfamily = font, color = pal("blues", 3), size = k(3)
     )
 
   return(plot)
 }
+
+regions <- c(
+  "Africa"   = pal("blues", 2),
+  "Americas" = pal("greens"),
+  "Asia"     = pal("reds", 2),
+  "Europe"   = pal("yellows"),
+  "Oceania"  = pal("unblues", 2),
+  "Unknown"  = pal("grays", 3)
+)
 
 
 # Migrant stocks ----------------------------------------------------------
 
 plot_migstocks <- function(hero,
                            basesize,
+                           font,
                            title = paste0(
-                               "Migrant populations, ",
-                               grab_plot_data("stocks", hero, years = TRUE) |>
-                                 paste(collapse = "–")
-                             )
-                           ) {
+                             "Migrant populations, ",
+                             gdi_plot_data("stocks", hero)$range |>
+                               paste(collapse = "\u2013")
+                           )) {
 
-  k <- function(factor = 1) factor * basesize / ggplot2::.pt
+  k <- function(factor = 1) factor * basesize / .pt
   source <- "Source: UN DESA."
   name <- namer(hero)
-
-  regions <- dplyr::filter(countrynames, !is.na(.data$region)) |>
-    dplyr::distinct(.data$region) |>
-    dplyr::arrange(.data$region) |>
-    dplyr::pull(.data$region)
-  regions <- c(regions, "Unknown")
-
   timespan <- unique(gdidata::undesa_stocks$t)
 
-  panel_emig_display <- "Emigrants from {name}\nand where they reside" |>
-    stringr::str_glue()
-  panel_immig_display <- "Immigrants in {name}\nand where they come from" |>
-    stringr::str_glue()
+  emig_disp <- paste0("Emigrants from ", name, "\nand where they reside")
+  immig_disp <- paste0("Immigrants in ", name, "\nand where they come from")
 
-  df <- grab_plot_data("stocks", hero) |>
-    dplyr::mutate(panel = ifelse(
-      .data$panel == "emig",
-      panel_emig_display,
-      panel_immig_display
-    ))
+  data <- gdi_plot_data("stocks", hero)$data |>
+    mutate(panel = ifelse(.data$panel == "emig", emig_disp, immig_disp))
 
   plot_elements <- list(
-    ggplot2::geom_area(stat = "identity"),
-    ggplot2::facet_wrap(~.data$panel),
-    ggplot2::labs(title = title, caption = source),
-    ggplot2::scale_x_continuous(
+    facet_wrap(~.data$panel),
+    geom_area(stat = "identity"),
+    labs(title = title, caption = source),
+    scale_x_continuous(
       breaks = seq(1990, 2020, 10),
-      expand = ggplot2::expansion(mult = .05),
-      guide = ggplot2::guide_axis(minor.ticks = TRUE)
+      expand = expansion(mult = .05),
+      guide = guide_axis(minor.ticks = TRUE)
     ),
-    ggplot2::scale_fill_manual(values = c(
-      "Africa" = pal("blues", 2),
-      "Americas" = pal("greens"),
-      "Asia" = pal("reds", 2),
-      "Europe" = pal("yellows"),
-      "Oceania" = pal("unblues", 2),
-      "Unknown" = pal("grays", 3)
-    )),
-    apply_theme("bar-vertical", basesize, facets = TRUE),
-    ggplot2::theme(
-      axis.title.y = ggplot2::element_text(
-        size = basesize,
-        margin = ggplot2::margin(r = k(2))
-      ),
-      axis.ticks.x = ggplot2::element_line(
-        color = pal("blues"),
-        linewidth = k(.05)),
+    scale_fill_manual(values = regions),
+    apply_theme("bar-vertical", basesize, font, facets = TRUE),
+    theme(
+      axis.ticks.x = element_line(color = pal("blues"), linewidth = k(.05)),
       legend.position = "right",
-      panel.spacing.x = grid::unit(k(.5), "lines"),
-      plot.margin = ggplot2::margin(k(2), 0, k(2), k(2)),
-      strip.text = ggplot2::element_text(
+      panel.spacing.x = unit(k(.5), "lines"),
+      plot.margin = margin(k(2), 0, k(2), k(2)),
+      strip.text = element_text(
         size = basesize,
-        margin = ggplot2::margin(t = 0, b = k())
+        margin = margin(t = 0, b = k())
       )
     )
   )
 
-  if (nrow(df) > 0) {
+  if (nrow(data) > 0) {
 
-    check_max <- df |>
-      summarise(n = sum(n, na.rm = TRUE), .by = c(panel, t))
-    max_n <- max(check_max$n)
+    df_agg <- data |>
+      summarise(n = sum(.data$n, na.rm = TRUE), .by = c(.data$panel, .data$t))
+    axis <- set_axis(df_agg$n, "Persons")
 
-    set_breaks <- ggplot2::waiver()
-    set_labels <- function(x) x / 10^6
-    set_ytitle <- "Millions of individuals"
-
-    if (max_n < 1200) {
-      set_ytitle <- "Individuals"
-      set_labels <- ggplot2::waiver()
-    }
-    if (max_n >= 1200 & max_n < 1.20 * 10^6) {
-      set_ytitle <- "Thousands of individuals"
-      set_labels <- function(x) x / 1000
-    }
-    if (max_n >= 1.20 * 10^6 & max_n < 1.40 * 10^6) {
-      set_breaks <- seq(0, 1.25 * 10^6, .25 * 10^6)
-      set_labels <- c("0", "0.25", "0.50", "0.75", "1", "1.25")
-    }
-    if (max_n >= 1.40 * 10^6 & max_n < 1.80 * 10^6) {
-      set_breaks <- seq(0, 1.50 * 10^6, .50 * 10^6)
-      set_labels <- c("0", "0.5", "1", "1.5")
-    }
-
-    df <- df |>
-      tidyr::complete(
-        region = regions,
+    df <- data |>
+      complete(
+        region = names(regions),
         t = timespan,
-        panel,
+        .data$panel,
         fill = list(n = 0)
       )
 
-    plot <- ggplot2::ggplot(
+    plot <- ggplot(
       df,
-      ggplot2::aes(x = .data$t, y = n, group = .data$region, fill = .data$region)
+      aes(x = .data$t, y = .data$n, group = .data$region, fill = .data$region)
     ) +
       plot_elements +
-      ggplot2::scale_y_continuous(
-        name = set_ytitle,
-        breaks = set_breaks,
-        labels = set_labels,
-        expand = ggplot2::expansion(mult = c(0, .025))
-      )
+      scale_y_continuous(
+        name = axis$title,
+        breaks = axis$breaks,
+        labels = axis$labels,
+        expand = expansion(mult = c(0, .025))
+      ) +
+      theme(axis.title.y = element_text(
+        size = basesize,
+        margin = margin(r = k(2))
+      ))
 
   } else {
 
-    df <- df |>
-      tidyr::complete(
-        region = regions,
-        t = timespan,
-        panel = c(panel_emig, panel_immig),
-        fill = list(n = 0)
+    df <- expand.grid(
+      region = names(regions),
+      t = timespan,
+      panel = c(emig_disp, immig_disp),
+      n = 0
+    )
+
+    plot <- ggplot(
+      df,
+      aes(x = .data$t, y = .data$n, group = .data$region, fill = .data$region)
+    ) +
+      plot_elements +
+      theme(
+        axis.text.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.background = element_rect(color = NA, fill = pal("unblues", 5)),
+        panel.grid.major.y = element_blank(),
       )
 
-    plot <- ggplot2::ggplot(
-      df,
-      ggplot2::aes(x = .data$t, y = .data$n, group = .data$region, fill = .data$region)) +
-      plot_elements +
-      ggplot2::theme(axis.text.y = ggplot2::element_blank())
-
-    plot <- cowplot::ggdraw(plot) +
-      cowplot::draw_label(
-        "No data", x = .2240, y = .5,
-        fontfamily = "Gill Sans Nova",
+    plot <- ggdraw(plot) +
+      draw_label(
+        "No data",
+        x = .2240,
+        y = .5,
+        fontfamily = font,
         color = pal("blues", 3),
         size = k(3)
       ) +
-      cowplot::draw_label(
-        "No data", x = .6575, y = .5,
-        fontfamily = "Gill Sans Nova",
+      draw_label(
+        "No data",
+        x = .6575,
+        y = .5,
+        fontfamily = font,
         color = pal("blues", 3),
         size = k(3)
       )
@@ -219,128 +234,87 @@ plot_migstocks <- function(hero,
 
 plot_nats <- function(hero,
                       basesize,
+                      font,
                       title = paste0(
-                          "Destinations and origins of migrants, ",
-                          grab_plot_data("nats", hero, year_max = TRUE)
-                        )
-                      ) {
+                        "Destinations and origins of migrants, ",
+                        gdi_plot_data("nats", hero)$max_t
+                      )) {
 
   k <- function(factor = 1) factor * basesize / .pt
-  p_source <- "Source: UN DESA."
-  df <- grab_plot_data("nats", hero)
+  source <- "Source: UN DESA."
+  data <- gdi_plot_data("nats", hero)$data
 
-  if (nrow(df) > 0) {
+  if (nrow(data) > 0) {
 
-    df <- df |>
-      dplyr::mutate(country = dplyr::case_when(
-        .data$country == breakers$from[1] ~ breakers$to[1],
-        .data$country == breakers$from[2] ~ breakers$to[2],
-        .data$country == breakers$from[3] ~ breakers$to[3],
-        .data$country == breakers$from[4] ~ breakers$to[4],
-        .data$country == breakers$from[5] ~ breakers$to[5],
-        .data$country == breakers$from[6] ~ breakers$to[6],
-        .data$country == breakers$from[7] ~ breakers$to[7],
-        .data$country == breakers$from[8] ~ breakers$to[8],
-        .default = .data$country
-      ))
+    df <- mutate(data, country = break_lines(.data$country))
 
-    df_destin <- dplyr::filter(df, str_detect(.data$panel, "Destinations"))
-    df_origin <- dplyr::filter(df, str_detect(.data$panel, "Origins"))
-
+    df_destin <- filter(df, str_detect(.data$panel, "Destinations"))
+    df_origin <- filter(df, str_detect(.data$panel, "Origins"))
     df_destin$country <- factor(df_destin$country, levels = df_destin$country)
     df_origin$country <- factor(df_origin$country, levels = df_origin$country)
 
-    scales <- list(
-      ggplot2::scale_x_continuous(
-        labels = function(x) prettylabel(x, pct = TRUE),
-        expand = ggplot2::expansion(mult = c(.02, .15))
+    plot_elements <- list(
+      geom_bar(stat = "identity", width = .7, show.legend = FALSE),
+      geom_text(
+        aes(label = prettylabel(.data$share, pct = TRUE), color = .data$region),
+        size = k(),
+        family = font,
+        fontface = "bold",
+        hjust = 0, vjust = .5,
+        nudge_x = max(df$share) / 30,
+        show.legend = FALSE
       ),
-      ggplot2::scale_y_discrete(expand = ggplot2::expansion(mult = .15)),
-      ggplot2::scale_fill_manual(values = c(
+      scale_x_continuous(
+        labels = function(x) prettylabel(x, pct = TRUE),
+        expand = expansion(mult = c(.02, .15))
+      ),
+      scale_y_discrete(expand = expansion(mult = .15)),
+      scale_fill_manual(values = c(
         "Africa"   = pal("blues", 2),
         "Americas" = pal("greens"),
         "Asia"     = pal("reds", 2),
         "Europe"   = pal("yellows"),
         "Oceania"  = pal("unblues", 2),
-        "Others"   = pal("grays", 4)
+        "Others"   = pal("grays", 4),
+        "Unknown"  = pal("grays", 3)
       )),
-      ggplot2::scale_color_manual(values = c(
+      scale_color_manual(values = c(
         "Africa"   = pal("blues"),
         "Americas" = pal("greens"),
         "Asia"     = pal("reds"),
         "Europe"   = pal("oranges"),
         "Oceania"  = pal("unblues"),
-        "Others"   = pal("grays", 2)
-      ))
+        "Others"   = pal("grays", 2),
+        "Unknown"  = pal("grays", 2)
+      )),
+      apply_theme(type = "bar-horizontal", basesize, font),
+      theme(
+        axis.text.y = element_text(size = basesize - 1, lineheight = k(.35)),
+        plot.title = element_text(
+          size = basesize,
+          face = "plain",
+          margin = margin(t = 0, b = k(2))
+        )
+      )
     )
 
-    p_destin <- ggplot2::ggplot(
+    p_destin <- ggplot(
       df_destin,
-      ggplot2::aes(x = share, y = country, fill = region)
+      aes(x = .data$share, y = .data$country, fill = .data$region)
     ) +
-      ggplot2::geom_bar(stat = "identity", width = .7, show.legend = FALSE) +
-      ggplot2::geom_text(
-        ggplot2::aes(
-          label = prettylabel(share, pct = TRUE),
-          color = region
-        ),
-        size = k(),
-        family = "Gill Sans Nova",
-        fontface = "bold",
-        hjust = 0, vjust = .5,
-        nudge_x = max(df_destin$share) / 30,
-        show.legend = FALSE
-      ) +
-      ggplot2::ggtitle("Destinations of emigrants") +
+      ggtitle("Destinations of emigrants") +
+      plot_elements +
+      theme(plot.margin = margin(0, k(2), 0, 0))
 
-      scales +
-
-      # Aesthetics
-      apply_theme(type = "bar-horizontal", basesize) +
-      theme(
-        axis.text.y = element_text(
-          size = basesize - 1,
-          lineheight = k(.35)
-        ),
-        plot.title = element_text(
-          size = basesize,
-          face = "plain",
-          margin = margin(t = 0, b = k(2))
-        ),
-        plot.margin = margin(0, k(2), 0, 0)
-      )
-
-    p_origin <- ggplot(df_origin, aes(x = share, y = country, fill = region)) +
-      geom_bar(stat = "identity", width = .7, show.legend = FALSE) +
-      geom_text(
-        mapping = aes(label = prettylabel(share, pct = TRUE), color = region),
-        size = k(),
-        family = "Gill Sans Nova",
-        fontface = "bold",
-        hjust = 0, vjust = .5,
-        nudge_x = max(df_origin$share) / 30,
-        show.legend = FALSE
-      ) +
+    p_origin <- ggplot(
+      df_origin,
+      aes(x = .data$share, y = .data$country, fill = .data$region)
+    ) +
       ggtitle("Origins of immigrants") +
+      plot_elements +
+      theme(plot.margin = margin(0, 0, 0, k(2)))
 
-      scales +
-
-      # Aesthetics
-      apply_theme(type = "bar-horizontal", basesize) +
-      theme(
-        axis.text.y = element_text(
-          size = basesize - 1,
-          lineheight = k(.35)
-        ),
-        plot.title = element_text(
-          size = basesize,
-          face = "plain",
-          margin = margin(t = 0, b = k(2))
-        ),
-        plot.margin = margin(0, 0, 0, k(2))
-      )
-
-    plot <- cowplot::plot_grid(p_destin, p_origin, nrow = 1)
+    plot <- plot_grid(p_destin, p_origin, nrow = 1)
 
     plot_title <- ggplot() +
       ggtitle(title) +
@@ -348,11 +322,11 @@ plot_nats <- function(hero,
       theme(plot.margin = margin(0, 0, 0, 0))
 
     plot_caption <- ggplot() +
-      labs(caption = p_source) +
+      labs(caption = source) +
       apply_theme(type = "map", basesize) +
       theme(plot.margin = margin(0, 0, 0, 0))
 
-    plot <- cowplot::plot_grid(
+    plot <- plot_grid(
       plot_title, plot, plot_caption,
       nrow = 3,
       rel_heights = c(.05, 1, .05)
@@ -361,54 +335,46 @@ plot_nats <- function(hero,
 
   } else {
 
-    p_destin <- ggplot() +
-      ggtitle("Emigrant destinations") +
-      apply_theme(type = "void", basesize) +
-      theme(
-        panel.background = element_blank(),
-        plot.title = element_text(
-          size = basesize,
-          face = "plain",
-          margin = margin(t = 0, b = k())
-        )
-      )
-    p_destin <- cowplot::ggdraw(p_destin) +
-      cowplot::draw_label(
-        "No data", y = .4,
-        fontfamily = "Gill Sans Nova",
-        color = pal("blues", 3),
-        size = k(3)
-      )
+    panel_empty_bar <- function(title) {
 
-    p_origin <- ggplot() +
-      ggtitle("Immigrant origins") +
-      apply_theme(type = "void", basesize) +
-      theme(
-        panel.background = element_blank(),
-        plot.title = element_text(
-          size = basesize,
-          face = "plain",
-          margin = margin(t = 0, b = k())
+      plot_base <- ggplot() +
+        ggtitle(title) +
+        apply_theme(type = "void", basesize, font) +
+        theme(
+          panel.background = element_rect(color = NA, fill = pal("unblues", 5)),
+          plot.title = element_text(
+            size = basesize,
+            face = "plain",
+            margin = margin(t = 0, b = k(3))
+          )
         )
-      )
-    p_origin <- cowplot::ggdraw(p_origin) +
-      cowplot::draw_label(
-        "No data", y = .4,
-        fontfamily = "Gill Sans Nova",
-        color = pal("blues", 3),
-        size = k(3)
-      )
 
-    plot <- cowplot::plot_grid(p_destin, p_origin, nrow = 1)
+      plot <- ggdraw(plot_base) +
+        draw_label(
+          "No data",
+          y = .4,
+          fontfamily = font,
+          color = pal("blues", 3),
+          size = k(3)
+        )
+
+      return(plot)
+    }
+
+    plot <- plot_grid(
+      panel_empty_bar("Emigrant destinations"),
+      panel_empty_bar("Immigrant origins"),
+      nrow = 1
+    )
 
     plot_title <- ggplot() +
       ggtitle(title) +
-      apply_theme(type = "map", basesize) +
+      apply_theme(type = "map", basesize, font) +
       theme(plot.margin = margin(0, 0, 0, 0))
 
     plot_caption <- ggplot() +
-      labs(caption = p_source) +
-      apply_theme(type = "map", basesize) +
+      labs(caption = source) +
+      apply_theme(type = "map", basesize, font) +
       theme(plot.margin = margin(0, 0, 0, 0))
 
     plot <- plot_grid(
@@ -427,62 +393,56 @@ plot_nats <- function(hero,
 
 plot_nmig <- function(hero,
                       basesize,
+                      font,
                       title = paste0(
-                          "Net migration rate, ",
-                          grab_plot_data("nmig", hero, years = TRUE) |>
-                            paste(collapse = "–")
-                        )
-                      ) {
+                        "Net migration rate, ",
+                        gdi_plot_data("nmig", hero)$range |>
+                          paste(collapse = "\u2013")
+                      )) {
 
-  k <- function(factor = 1) factor * basesize / ggplot2::.pt
+  k <- function(factor = 1) factor * basesize / .pt
   source <- "Source: World Bank."
-  t0 <- grab_plot_data("nmig", hero, years = TRUE)[1]
-  t1 <- grab_plot_data("nmig", hero, years = TRUE)[2]
-  timespan <- t0:t1
-  df <- grab_plot_data("nmig", hero)
+  t0 <- gdi_plot_data("nmig", hero)$range[1]
+  t1 <- gdi_plot_data("nmig", hero)$range[2]
+  data <- gdi_plot_data("nmig", hero)$data
 
-  if (nrow(df) > 0) {
+  if (nrow(data) > 0) {
 
-    t0 <- min(df$t)
-    t1 <- max(df$t)
-
-    plot <- ggplot2::ggplot(df, ggplot2::aes(x = t, y = netmigration)) +
-      ggplot2::geom_bar(stat = "identity", width = .7, fill = pal("blues", 2)) +
-      ggplot2::geom_hline(
+    plot <- ggplot(data, aes(x = .data$t, y = .data$v)) +
+      geom_bar(stat = "identity", width = .7, fill = pal("blues", 2)) +
+      geom_hline(
         yintercept = 0,
-        color = pal("blues"), linewidth = k(.1)
+        color = pal("blues"),
+        linewidth = k(.1)
       ) +
-      ggplot2::labs(title = title, caption = source) +
+      labs(title = title, caption = source) +
 
-      ggplot2::scale_x_continuous(
+      scale_x_continuous(
         breaks = seq(t0, t1, 10),
-        expand = ggplot2::expansion(mult = c(.03, .03)),
-        guide = ggplot2::guide_axis(minor.ticks = TRUE)
+        expand = expansion(mult = c(.03, .03)),
+        guide = guide_axis(minor.ticks = TRUE)
       ) +
-      ggplot2::scale_y_continuous(name = "Migrants per 1000 population") +
-      ggplot2::guides(
-        color = ggplot2::guide_legend(nrow = 2),
-        linetype =  ggplot2::guide_legend(nrow = 2)
+      scale_y_continuous(name = "Migrants per 1000 population") +
+      guides(
+        color = guide_legend(nrow = 2),
+        linetype =  guide_legend(nrow = 2)
       ) +
 
-      apply_theme(type = "bar-vertical", basesize) +
-      ggplot2::theme(
-        axis.title.y = ggplot2::element_text(
+      apply_theme(type = "bar-vertical", basesize, font) +
+      theme(
+        axis.title.y = element_text(
           size = basesize,
-          margin = ggplot2::margin(r = k(2))
+          margin = margin(r = k(2))
         ),
-        axis.ticks.x = ggplot2::element_line(
+        axis.ticks.x = element_line(
           color = pal("blues"),
           linewidth = k(.05)
         ),
         legend.position = "none",
-        plot.margin = ggplot2::margin(k(2), k(2), k(2), k(2))
+        plot.margin = margin(k(2), k(2), k(2), k(2))
       )
 
-  } else {
-
-    plot <- plot_empty(title, source, timespan, basesize)
-  }
+  } else plot <- plot_empty(title, source, t0:t1, basesize, font)
 
   return(plot)
 }
@@ -492,120 +452,89 @@ plot_nmig <- function(hero,
 
 plot_idp <- function(hero,
                      basesize,
+                     font,
                      title = paste0(
-                         "New internal displacements, ",
-                         grab_plot_data("idp", hero, years = TRUE) |>
-                           paste(collapse = "–")
-                       )
-                     ) {
+                       "New internal displacements, ",
+                       gdi_plot_data("idp", hero)$range |>
+                         paste(collapse = "\u2013")
+                     )) {
 
-  k <- function(factor = 1) factor * basesize / ggplot2::.pt
+  k <- function(factor = 1) factor * basesize / .pt
   source <- "Source: IDMC."
-  t0 <- grab_plot_data("nmig", hero, years = TRUE)[1]
-  t1 <- grab_plot_data("nmig", hero, years = TRUE)[2]
-  timespan <- t0:t1
+  t0 <- gdi_plot_data("idp", hero)$range[1]
+  t1 <- gdi_plot_data("idp", hero)$range[2]
 
-  timespan <- idmc_flows |> distinct(t) |> pull(t)
   causes <- c(
-    "Environmental impacts",
-    "Conflict and violence"
+    "Environmental impacts" = pal("blues", 2),
+    "Conflict and violence" = pal("reds", 2)
   )
 
-  data <- filter(idmc_flows, geo == hero) |>
-    mutate(cause = case_when(
-      cause == "conflict" ~ causes[2],
-      .default = causes[1]
-    )) |>
-    summarise(n = sum(n), .by = c(geo, t, cause))
+  data <- gdi_plot_data("idp", hero)$data
+
+  plot_elements <- list(
+    geom_bar(
+      aes(x = factor(.data$t), y = .data$n, fill = fct_rev(.data$cause)),
+      stat = "identity",
+      position = "stack",
+      width = .7
+    ),
+    labs(title = title, caption = source),
+    scale_fill_manual(values = causes),
+    apply_theme(type = "bar-vertical", basesize, font),
+    theme(plot.margin = margin(k(2), k(2), k(2), k(2)))
+  )
 
   if (nrow(data) > 0) {
 
-    df_agg <- summarise(data, n = sum(n), .by = t) |> filter(n > 0)
+    df_agg <- summarise(data, n = sum(.data$n), .by = .data$t) |>
+      filter(.data$n > 0)
+    axis <- set_axis(df_agg$n, "Displacements")
 
-    check_max <- data |> summarise(n = sum(n), .by = t)
-    max_n <- max(check_max$n)
+    df <- complete(data, t = t0:t1, cause = names(causes))
 
-    set_breaks <- waiver()
-    set_labels <- function(x) x / 10^6
-    set_ytitle <- "Millions of displacements"
-
-    if (max_n < 1.20 * 10^6) {
-      set_ytitle <- "Thousands of displacements"
-      set_labels <- function(x) x / 1000
-    }
-    if (max_n >= 1.20 * 10^6 & max_n < 1.40 * 10^6) {
-      set_breaks <- seq(0, 1.25 * 10^6, .25 * 10^6)
-      set_labels <- c("0", "0.25", "0.50", "0.75", "1", "1.25")
-    }
-    if (max_n >= 1.40 * 10^6 & max_n < 1.80 * 10^6) {
-      set_breaks <- seq(0, 1.50 * 10^6, .50 * 10^6)
-      set_labels <- c("0", "0.5", "1", "1.5")
-    }
-
-    df <- complete(data, t = timespan, cause = causes)
-
-    plot <- ggplot() +
-      geom_bar(
-        aes(x = factor(t), y = n, fill = fct_rev(cause)), df,
-        stat = "identity", position = "stack", width = .7
-      ) +
-      scale_fill_manual(values = c(pal("blues", 2), pal("reds", 2))) +
-
-      # Annotations
+    plot <- ggplot(df) +
+      plot_elements +
       geom_text(
-        aes(x = factor(t), y = n, label = prettylabel(n)),
+        aes(x = factor(.data$t), y = .data$n, label = prettylabel(.data$n)),
         df_agg,
-        size = k(.9), color = pal("blues"), vjust = 0,
-        family = "Gill Sans Nova", fontface = "bold",
+        color = pal("blues"),
+        family = font,
+        fontface = "bold",
+        size = k(.9),
+        vjust = 0,
         nudge_y = max(df$n, na.rm = TRUE) / 40
       ) +
-      labs(title = str_glue("{p_title}, {range2(df)}"), caption = p_source) +
-
-      # Aesthetics
-      apply_theme(type = "bar-vertical", basesize) +
       scale_y_continuous(
-        name = set_ytitle,
-        breaks = set_breaks,
-        labels = set_labels
+        name = axis$title,
+        breaks = axis$breaks,
+        labels = axis$labels,
+        expand = expansion(mult = c(.02, .05))
       ) +
       theme(
         axis.title.y = element_text(
-          size = size$text,
+          size = basesize,
           margin = margin(r = k(2))
         ),
         axis.text.x = element_text(margin = margin(t = -k(.5))),
-        plot.margin = margin(k(4), k(4), k(.25), k(4))
       )
 
   } else {
 
-    df <- complete(data, t = timespan, cause = causes, fill = list(n = 0))
+    df <- expand.grid(t = t0:t1, cause = names(causes), n = 0)
 
-    plot <- ggplot() +
-      geom_bar(
-        aes(x = factor(t), y = n, fill = fct_rev(cause)), df,
-        stat = "identity", position = "stack", width = .7
-      ) +
-      scale_fill_manual(values = c(pal("blues", 2), pal("reds", 2))) +
-      labs(title = p_title, caption = p_source) +
-      apply_theme(type = "bar-vertical", basesize) +
-      scale_y_continuous(limits = c(0, 10), breaks = 0) +
+    plot <- ggplot(df) +
+      plot_elements +
       theme(
-        axis.text.x = element_text(margin = margin(t = -k(.5))),
         axis.text.y = element_blank(),
-        legend.key.size = unit(size$text, "points"),
-        legend.text = element_text(
-          size = size$text,
-          margin = margin(r = 0, l = k(.75))
-        ),
-        plot.margin = margin(k(4), k(4), k(.75), k(4))
+        panel.background = element_rect(color = NA, fill = pal("unblues", 5)),
+        panel.grid.major.y = element_blank(),
       )
 
     plot <- ggdraw(plot) +
       draw_label(
         "No data",
         y = .55,
-        fontfamily = "Gill Sans Nova",
+        fontfamily = font,
         color = pal("blues", 3),
         size = k(3)
       )
@@ -613,3 +542,237 @@ plot_idp <- function(hero,
 
   return(plot)
 }
+
+
+# Dead or missing migrants ------------------------------------------------
+
+plot_mmp <- function(hero,
+                     basesize,
+                     font,
+                     title = paste0(
+                       "Dead or missing international migrants, ",
+                       gdi_plot_data("mmp", hero)$range |>
+                         paste(collapse = "\u2013")
+                     )) {
+
+  k <- function(factor = 1) factor * basesize / .pt
+  source <- "Source: IOM Missing Migrants Project."
+  t0 <- gdi_plot_data("mmp", hero)$range[1]
+  t1 <- gdi_plot_data("mmp", hero)$range[2]
+
+  causes <- c(
+    "Drowning"          = pal("blues", 2),
+    "Transport hazards" = pal("blues", 4),
+    "Harsh conditions"  = pal("greens"),
+    "Accidental"        = pal("greens", 3),
+    "Sickness"          = pal("yellows"),
+    "Violence"          = pal("reds", 2),
+    "Mixed or unknown"  = pal("grays", 3)
+  )
+
+  data <- gdi_plot_data("mmp", hero)$data
+
+  plot_elements <- list(
+    geom_bar(
+      aes(
+        x = factor(.data$t),
+        y = .data$n,
+        fill = factor(.data$cause, levels = names(causes))
+      ),
+      stat = "identity",
+      position = "stack",
+      width = .7
+    ),
+    labs(title = title, caption = source),
+    scale_x_discrete(label = function(x) {
+      ifelse(x == 2014, 2014, paste0("'", substr(x, 3, 4)))
+    }),
+    scale_fill_manual(name = "Cause", values = causes),
+    apply_theme(type = "bar-vertical", basesize, font),
+    theme(
+      legend.key.size = unit(basesize, "points"),
+      legend.text = element_text(
+        size = basesize - 1,
+        margin = margin(r = 0, l = k(.75))
+      ),
+      plot.margin = margin(k(2), k(2), k(2), k(2))
+    )
+  )
+
+  if (nrow(data) > 0) {
+
+    df_agg <- summarise(data, n = sum(.data$n), .by = .data$t) |>
+      filter(.data$n > 0)
+    df <- complete(data, t = t0:t1, cause = names(causes))
+
+    plot <- ggplot(df) +
+      plot_elements +
+      geom_text(
+        aes(x = factor(.data$t), y = .data$n, label = prettylabel(.data$n)),
+        df_agg,
+        color = pal("blues"),
+        family = font,
+        fontface = "bold",
+        size = k(),
+        vjust = 0,
+        nudge_y = max(df$n, na.rm = TRUE) / 40
+      ) +
+      scale_y_continuous(
+        name = "Persons",
+        labels = function(x) prettylabel(x, spell = TRUE)
+      ) +
+      theme(
+        axis.title.y = element_text(
+          size = basesize,
+          margin = margin(r = k(2))
+        ),
+        axis.text.x = element_text(margin = margin(t = -k(.5))),
+      )
+
+  } else {
+
+    df <- expand.grid(t = t0:t1, cause = names(causes), n = 0)
+
+    plot <- ggplot(df) +
+      plot_elements +
+      theme(
+        axis.text.y = element_blank(),
+        panel.background = element_rect(color = NA, fill = pal("unblues", 5)),
+        panel.grid.major.y = element_blank(),
+      )
+
+    plot <- ggdraw(plot) +
+      draw_label(
+        "None recorded",
+        y = .6,
+        fontfamily = font,
+        color = pal("blues", 3),
+        size = k(3)
+      )
+  }
+
+  return(plot)
+}
+
+
+# Refugees ----------------------------------------------------------------
+
+plot_refug <- function(hero,
+                       basesize,
+                       font,
+                       title = paste0(
+                         "Refugee populations, ",
+                         gdi_plot_data("refug", hero)$range |>
+                           paste(collapse = "\u2013")
+                       )) {
+
+  k <- function(factor = 1) factor * basesize / .pt
+  source <- "Source: UNHCR."
+  name <- namer(hero)
+  t0 <- gdi_plot_data("refug", hero)$range[1]
+  t1 <- gdi_plot_data("refug", hero)$range[2]
+
+  orig_disp <- paste0("Refugees from ", name, "\nand where they are hosted")
+  host_disp <- paste0("Refugees hosted in ", name, "\nand where they come from")
+
+  data <- gdi_plot_data("refug", hero)$data |>
+    mutate(panel = ifelse(.data$panel == "orig", orig_disp, host_disp))
+
+  plot_elements <- list(
+    geom_area(stat = "identity"),
+    facet_wrap(~fct_relevel(.data$panel, host_disp, after = Inf)),
+    labs(title = title, caption = source),
+    scale_x_continuous(
+      breaks = seq(1990, 2020, 10),
+      expand = expansion(mult = .05),
+      guide = guide_axis(minor.ticks = TRUE)
+    ),
+    scale_fill_manual(values = regions),
+    apply_theme("bar-vertical", basesize, font, facets = TRUE),
+    theme(
+      axis.ticks.x = element_line(color = pal("blues"), linewidth = k(.05)),
+      legend.position = "right",
+      panel.spacing.x = unit(k(.5), "lines"),
+      plot.margin = margin(k(4), 0, k(.25), k(4)),
+      strip.text = element_text(
+        size = basesize,
+        margin = margin(t = 0, b = k())
+      )
+    )
+  )
+
+  if (nrow(data) > 0) {
+
+    df_agg <- summarise(data, n = sum(.data$n), .by = c(.data$t, .data$panel))
+    axis <- set_axis(df_agg$n, "Persons")
+
+    df <- data |>
+      complete(
+        region = names(regions),
+        t = t0:t1,
+        panel = c(orig_disp, host_disp),
+        fill = list(n = 0)
+      )
+
+    plot <- ggplot(
+      df,
+      aes(x = .data$t, y = .data$n, group = .data$region, fill = .data$region)) +
+      plot_elements +
+      scale_y_continuous(
+        name = axis$title,
+        breaks = axis$breaks,
+        labels = axis$labels,
+        expand = expansion(mult = c(0, .025))
+      ) +
+      theme(axis.title.y = element_text(
+        size = basesize,
+        margin = margin(r = k(2))
+      ))
+
+  } else {
+
+    df <- expand.grid(
+      region = names(regions),
+      t = t0:t1,
+      panel = c(orig_disp, host_disp),
+      n = 0
+    )
+
+    plot <- ggplot(
+      df,
+      aes(x = .data$t, y = .data$n, group = .data$region, fill = .data$region)
+    ) +
+      plot_elements +
+      theme(
+        axis.text.y = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.background = element_rect(color = NA, fill = pal("unblues", 5)),
+        panel.grid.major.y = element_blank(),
+      )
+
+    plot <- ggdraw(plot) +
+      draw_label(
+        "No data",
+        x = .2240,
+        y = .5,
+        fontfamily = font,
+        color = pal("blues", 3),
+        size = k(3)
+      ) +
+      draw_label(
+        "No data",
+        x = .6575,
+        y = .5,
+        fontfamily = font,
+        color = pal("blues", 3),
+        size = k(3)
+      )
+  }
+
+  return(plot)
+}
+
+
+
+
+
