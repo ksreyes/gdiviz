@@ -4,10 +4,10 @@
 \alias{gdi_plot_data}
 \title{Grab data behind a preset plot}
 \usage{
-gdi_plot_data(plot_key, iso)
+gdi_plot_data(key, iso)
 }
 \arguments{
-\item{plot_key}{Plot key.}
+\item{key}{Plot key.}
 
 \item{iso}{Country.}
 }

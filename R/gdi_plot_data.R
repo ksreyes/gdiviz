@@ -1,11 +1,11 @@
 
 #' Grab data behind a preset plot
 #'
-#' @param plot_key Plot key.
+#' @param key Plot key.
 #' @param iso Country.
 #'
 #' @export
-gdi_plot_data <- function(plot_key, iso) {
+gdi_plot_data <- function(key, iso) {
 
   ranger <- function(data) c(min(data$t), max(data$t))
   name <- namer(iso)
@@ -17,7 +17,7 @@ gdi_plot_data <- function(plot_key, iso) {
     max_t = NULL
   )
 
-  if (plot_key == "stocks") {
+  if (key == "stocks") {
 
     output$data <- bind_rows(
 
@@ -60,7 +60,7 @@ gdi_plot_data <- function(plot_key, iso) {
     output$range <- ranger(gdidata::undesa_stocks)
   }
 
-  if (plot_key == "nats") {
+  if (key == "nats") {
 
     topn <- 5
 
@@ -164,7 +164,7 @@ gdi_plot_data <- function(plot_key, iso) {
     output$range <- rep(max(gdidata::undesa_stocks$t), 2)
   }
 
-  if (plot_key == "nmig") {
+  if (key == "nmig") {
 
     nmig <- filter(gdidata::wdi, .data$var == "nmig") |>
       rename(nmig = .data$v) |>
@@ -192,7 +192,7 @@ gdi_plot_data <- function(plot_key, iso) {
     output$range <- ranger(data)
   }
 
-  if (plot_key == "idp") {
+  if (key == "idp") {
 
     causes <- c("Environmental impacts", "Conflict and violence")
 
@@ -218,7 +218,7 @@ gdi_plot_data <- function(plot_key, iso) {
     output$range <- ranger(gdidata::idmc_flows)
   }
 
-  if (plot_key == "mmp") {
+  if (key == "mmp") {
 
     causes <- c(
       "Drowning",
@@ -268,7 +268,7 @@ gdi_plot_data <- function(plot_key, iso) {
     output$range <- ranger(data_full)
   }
 
-  if (plot_key == "refug") {
+  if (key == "refug") {
 
     panel_orig <- paste0(
       "Refugees from ",
