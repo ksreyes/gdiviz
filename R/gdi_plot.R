@@ -1,54 +1,62 @@
 
 #' Generate a preset plot
 #'
-#' @param plot_key Plot key.
+#' @param key Plot key.
 #' @param iso Country.
-#' @param basesize Base text size.
-#' @param title Plot title.
-#' @param dims If `TRUE`, returns the default plot dimensions in cm
-#'   (default`=FALSE`).
+#' @param basesize Base text size. Default is 7.
+#' @param font Font family. Default is Open Sans.
+#' @param ... Optional arguments.
 #'
-#' @returns `ggplot2` object.
+#' @description If `iso=NULL`, function returns `key` plot's metadata.
+#'
+#' @returns `ggplot2` object or a list of metadata.
 #'
 #' @export
-gdi_plot <- function(plot_key,
-                     iso,
+gdi_plot <- function(key,
+                     iso = NULL,
                      basesize = 7,
-                     title,
-                     dims = FALSE
-                     ) {
+                     font = "Open Sans",
+                     ...) {
 
-  dimensions <- c()
+  plots <- list(
+    "stocks" = list(
+      "func" = plot_migstocks,
+      "meta" = list(dims = c(16, 7))
+    ),
+    "nats" = list(
+      "func" = plot_nats,
+      "meta" = list(dims = c(16, 7))
+    ),
+    "nmig" = list(
+      "func" = plot_nmig,
+      "meta" = list(dims = c(8, 7))
+    ),
+    "idp" = list(
+      "func" = plot_idp,
+      "meta" = list(dims = c(8, 7))
+    )
+  )
 
-  if (!dims) {
+  if (key %in% names(plot_list)) {
 
-    if (plot_key == "stocks") {
-      if (missing(title)) plot <- plot_migstocks(iso, basesize)
-      else plot <- plot_migstocks(iso, basesize, title)
-      dimensions <- c(16, 7)
+    if (!is.null(iso)) {
+
+      if (iso %in% countrynames$iso3) {
+
+        return(plots[[key]]$func(iso, basesize, font, ...))
+
+      } else {
+
+        cli::cli_abort("{iso} is not a valid ISO3 code.")
+
+      }
+
+    } else {
+
+      return(plots[[key]]$meta)
+
     }
 
-    if (plot_key == "nats") {
-      if (missing(title)) plot <- plot_nats(iso, basesize)
-      else plot <- plot_nats(iso, basesize, title)
-      dimensions <- c(16, 7)
-    }
+  } else cli::cli_abort("{key} is not a valid plot key.")
 
-    if (plot_key == "nmig") {
-      if (missing(title)) plot <- plot_nmig(iso, basesize)
-      else plot <- plot_nmig(iso, basesize, title)
-      dimensions <- c(8, 7)
-    }
-
-    return(plot)
-
-  } else {
-
-    if (plot_key == "stocks") dimensions <- c(16, 7)
-    if (plot_key == "nats") dimensions <- c(16, 7)
-    if (plot_key == "nmig") dimensions <- c(8, 7)
-
-    return(dimensions)
-
-  }
 }

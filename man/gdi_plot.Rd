@@ -4,23 +4,22 @@
 \alias{gdi_plot}
 \title{Generate a preset plot}
 \usage{
-gdi_plot(plot_key, iso, basesize = 7, title, dims = FALSE)
+gdi_plot(key, iso = NULL, basesize = 7, font = "Open Sans", ...)
 }
 \arguments{
-\item{plot_key}{Plot key.}
+\item{key}{Plot key.}
 
 \item{iso}{Country.}
 
-\item{basesize}{Base text size.}
+\item{basesize}{Base text size. Default is 7.}
 
-\item{title}{Plot title.}
+\item{font}{Font family. Default is Open Sans.}
 
-\item{dims}{If \code{TRUE}, returns the default plot dimensions in cm
-(default\verb{=FALSE}).}
+\item{...}{Optional arguments.}
 }
 \value{
-\code{ggplot2} object.
+\code{ggplot2} object or a list of metadata.
 }
 \description{
-Generate a preset plot
+If \code{iso=NULL}, function returns \code{key} plot's metadata.
 }
