@@ -2,18 +2,34 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @import ggplot2
+#' @importFrom cowplot draw_label
+#' @importFrom cowplot ggdraw
+#' @importFrom cowplot plot_grid
+#' @importFrom dplyr arrange
+#' @importFrom dplyr bind_rows
+#' @importFrom dplyr case_when
+#' @importFrom dplyr desc
+#' @importFrom dplyr distinct
+#' @importFrom dplyr filter
+#' @importFrom dplyr group_by
+#' @importFrom dplyr inner_join
+#' @importFrom dplyr left_join
+#' @importFrom dplyr mutate
+#' @importFrom dplyr pull
+#' @importFrom dplyr rename
+#' @importFrom dplyr select
+#' @importFrom dplyr slice_head
+#' @importFrom dplyr summarise
+#' @importFrom dplyr ungroup
+#' @importFrom forcats fct_rev
 #' @importFrom rlang .data
+#' @importFrom stringr str_detect
+#' @importFrom stringr str_glue
+#' @importFrom tidyr complete
+#' @importFrom tidyr drop_na
+#' @importFrom tidyr pivot_wider
 ## usethis namespace: end
 NULL
 
-utils::globalVariables(c(
-  "countrynames",
-  "gdiplots",
-  "gdidata",
-  "stocks",
-  "indicators",
-  "idmc",
-  "wpp",
-  "mmp",
-  "disrupt"
-))
+utils::globalVariables(c("countrynames"))
