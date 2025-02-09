@@ -113,7 +113,7 @@ regions <- c(
 
 # Migrant stocks ----------------------------------------------------------
 
-plot_migstocks <- function(hero,
+plot_stocks <- function(hero,
                            basesize,
                            font,
                            title = paste0(
