@@ -247,7 +247,7 @@ plot_nats <- function(hero,
     plot <- plot_grid(
       plot_title, plot, plot_caption,
       nrow = 3,
-      rel_heights = c(.075, 1, .05)
+      rel_heights = c(.1, 1, .1)
     ) +
       theme(plot.margin = margin(k(2), k(2), k(2), k(2)))
 
@@ -609,7 +609,7 @@ plot_refug <- function(hero,
       axis.ticks.x = element_line(color = pal("blues"), linewidth = k(.05)),
       legend.position = "right",
       panel.spacing.x = unit(k(.5), "lines"),
-      plot.margin = margin(k(4), 0, k(.25), k(4)),
+      plot.margin = margin(k(2), 0, k(2), k(2)),
       strip.text = element_text(
         size = basesize,
         margin = margin(t = 0, b = k())

@@ -171,6 +171,9 @@ gdi_plot_data <- function(key, iso) {
     output$range <- rep(max(gdidata::undesa_stocks$t), 2)
   }
 
+
+  # Net migration -----------------------------------------------------------
+
   if (key == "nmig") {
 
     nmig <- filter(gdidata::wdi, .data$var == "nmig") |>
@@ -199,6 +202,9 @@ gdi_plot_data <- function(key, iso) {
     output$range <- ranger(data)
   }
 
+
+  # IDP ---------------------------------------------------------------------
+
   if (key == "idp") {
 
     causes <- c("Environmental impacts", "Conflict and violence")
@@ -224,6 +230,9 @@ gdi_plot_data <- function(key, iso) {
 
     output$range <- ranger(gdidata::idmc_flows)
   }
+
+
+  # Missing migrants --------------------------------------------------------
 
   if (key == "mmp") {
 
@@ -266,15 +275,17 @@ gdi_plot_data <- function(key, iso) {
 
       output$print <- bind_rows(output$data, agg) |>
         mutate(Country = gdidata::countryname(.data$geo, to = "name_text")) |>
-        select(.data$Country, .data$Cause, .data$t, .data$n) |>
+        select(.data$Country, Cause = .data$cause, .data$t, .data$n) |>
         arrange(.data$t) |>
         pivot_wider(names_from = .data$t, values_from = .data$n) |>
-        rename(Cause = .data$cause) |>
         arrange(match(.data$Cause, c("Total", causes)))
     }
 
     output$range <- ranger(data_full)
   }
+
+
+  # Refugees ----------------------------------------------------------------
 
   if (key == "refug") {
 
@@ -333,12 +344,12 @@ gdi_plot_data <- function(key, iso) {
 
       output$print <- bind_rows(agg, output$data) |>
         mutate(Panel = ifelse(.data$panel == "orig", panel_orig, panel_host)) |>
-        select(.data$Panel, Region = .data$region, .data$t, .data$n) |>
+        select(.data$Panel, .data$region, Year = .data$t, .data$n) |>
         arrange(
           .data$Panel,
-          .data$t, match(.data$Region, c("Total", names(regions)))
+          .data$t, match(.data$region, c("Total", names(regions)))
         ) |>
-        pivot_wider(names_from = .data$Region, values_from = .data$n)
+        pivot_wider(names_from = .data$region, values_from = .data$n)
     }
 
     output$range <- ranger(gdidata::unhcr)
