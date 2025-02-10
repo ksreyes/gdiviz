@@ -29,7 +29,7 @@ gdi_plot <- function(key,
       "dims" = c(12, 8)
     ),
     "idp" = list(
-      "dims" = c(12, 8)
+      "dims" = c(16, 8)
     ),
     "mmp" = list(
       "dims" = c(12, 8)
@@ -43,7 +43,7 @@ gdi_plot <- function(key,
 
     if (!is.null(iso)) {
 
-      if (iso %in% countrynames$iso3) {
+      if (iso %in% gdidata::countrynames$iso3) {
 
         plotter <- get(paste0("plot_", key), envir = asNamespace("gdiviz"))
         return(plotter(iso, basesize, font, ...))
