@@ -584,9 +584,6 @@ plot_mmp <- function(hero,
       width = .7
     ),
     labs(title = title, caption = source),
-    scale_x_discrete(label = function(x) {
-      ifelse(x == 2014, 2014, paste0("'", substr(x, 3, 4)))
-    }),
     scale_fill_manual(name = "Cause", values = causes),
     apply_theme(type = "bar-vertical", basesize, font),
     theme(
