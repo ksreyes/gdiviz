@@ -46,7 +46,7 @@ apply_theme <- function(type,
 
       legend.background = element_blank(),
       legend.key = element_blank(),
-      legend.key.spacing.y = grid::unit(.25 * size$text, "points"),
+      legend.key.spacing.y = grid::unit(0 * size$text, "points"),
       legend.text = element_text(
         size = size$text,
         margin = margin(r = k(2.5), l = k())
