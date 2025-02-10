@@ -45,7 +45,7 @@ gdi_plot <- function(key,
 
       if (iso %in% countrynames$iso3) {
 
-        plotter <- match.fun(paste0("plot_", key))
+        plotter <- get(paste0("plot_", key), envir = asNamespace("gdiviz"))
         return(plotter(iso, basesize, font, ...))
 
       } else cli::cli_abort("{iso} is not a valid ISO3 code.")
