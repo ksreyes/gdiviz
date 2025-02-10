@@ -259,6 +259,7 @@ gdi_plot_data <- function(key, iso) {
 
       output$print <- bind_rows(output$data, agg) |>
         mutate(Country = countryname(.data$geo, to = "name_text")) |>
+        select(-.data$geo) |>
         arrange(.data$t) |>
         pivot_wider(names_from = .data$t, values_from = .data$n) |>
         rename(Cause = .data$cause) |>
