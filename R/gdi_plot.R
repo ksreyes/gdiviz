@@ -20,22 +20,22 @@ gdi_plot <- function(key,
 
   keys <- list(
     "stocks" = list(
-      "dims" = c(16, 7)
+      "dims" = c(16, 8)
     ),
     "nats" = list(
-      "dims" = c(16, 7)
+      "dims" = c(16, 8)
     ),
     "nmig" = list(
-      "dims" = c(8, 7)
+      "dims" = c(12, 8)
     ),
     "idp" = list(
-      "dims" = c(8, 7)
+      "dims" = c(12, 8)
     ),
     "mmp" = list(
-      "dims" = c(8, 7)
+      "dims" = c(12, 8)
     ),
     "refug" = list(
-      "dims" = c(16, 7)
+      "dims" = c(16, 8)
     )
   )
 
