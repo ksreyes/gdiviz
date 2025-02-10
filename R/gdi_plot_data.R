@@ -22,7 +22,7 @@ gdi_plot_data <- function(key, iso) {
     output$data <- bind_rows(
 
       gdidata::undesa_stocks |>
-        left_join(countrynames, by = c("geo" = "iso3")) |>
+        left_join(gdidata::countrynames, by = c("geo" = "iso3")) |>
         filter(.data$from == iso) |>
         summarise(
           n = sum(.data$n),
@@ -32,7 +32,7 @@ gdi_plot_data <- function(key, iso) {
         rename(geo = .data$from),
 
       gdidata::undesa_stocks |>
-        left_join(countrynames, by = c("from" = "iso3")) |>
+        left_join(gdidata::countrynames, by = c("from" = "iso3")) |>
         filter(.data$geo == iso) |>
         summarise(
           n = sum(.data$n),
@@ -46,7 +46,7 @@ gdi_plot_data <- function(key, iso) {
 
     output$print <- output$data |>
       mutate(
-        country = countryname(.data$geo),
+        country = gdidata::countryname(.data$geo),
         panel = ifelse(.data$panel == "emig", "Emigrants", "Immigrants")
       ) |>
       select(.data$country, .data$panel, .data$region, .data$t, .data$n) |>
@@ -70,7 +70,7 @@ gdi_plot_data <- function(key, iso) {
     df <- bind_rows(
 
       gdidata::undesa_stocks |>
-        left_join(countrynames, by = c("geo" = "iso3")) |>
+        left_join(gdidata::countrynames, by = c("geo" = "iso3")) |>
         filter(.data$t == max(.data$t) & .data$from == iso) |>
         summarise(
           n = sum(.data$n),
@@ -80,7 +80,7 @@ gdi_plot_data <- function(key, iso) {
         rename(nat = .data$geo, iso = .data$from),
 
       gdidata::undesa_stocks |>
-        left_join(countrynames, by = c("from" = "iso3")) |>
+        left_join(gdidata::countrynames, by = c("from" = "iso3")) |>
         filter(.data$t == max(.data$t) & .data$geo == iso) |>
         summarise(
           n = sum(.data$n),
@@ -104,13 +104,13 @@ gdi_plot_data <- function(key, iso) {
       slice_head(n = topn) |>
       pull(.data$nat)
 
-    destin_order <- countryname(destin, to = "name_text") |> rev()
-    origin_order <- countryname(origin, to = "name_text") |> rev()
+    destin_order <- gdidata::countryname(destin, to = "name_text") |> rev()
+    origin_order <- gdidata::countryname(origin, to = "name_text") |> rev()
 
     df_destin1 <- filter(df, .data$panel == panel_dest) |>
       mutate(country = case_when(
         .data$nat %in% destin ~
-          countryname(.data$nat, from = "iso3", to = "name_text"),
+          gdidata::countryname(.data$nat, from = "iso3", to = "name_text"),
         .default = "Others"
       )) |>
       mutate(region = ifelse(
@@ -126,12 +126,13 @@ gdi_plot_data <- function(key, iso) {
     df_destin <- df_destin1 |>
       arrange(match(.data$country, c("Others", destin_order)))
     df_destin_print <- df_destin1 |>
-      arrange(match(.data$country, c(rev(destin_order), "Others")))
+      arrange(match(.data$country, c(rev(destin_order), "Others"))) |>
+      rename(Destination = .data$country)
 
     df_origin1 <- filter(df, .data$panel == panel_orig) |>
       mutate(country = case_when(
         .data$nat %in% origin ~
-          countryname(.data$nat, from = "iso3", to = "name_text"),
+          gdidata::countryname(.data$nat, from = "iso3", to = "name_text"),
         .default = "Others"
       )) |>
       mutate(region = ifelse(
@@ -147,15 +148,21 @@ gdi_plot_data <- function(key, iso) {
     df_origin <- df_origin1 |>
       arrange(match(.data$country, c("Others", origin_order)))
     df_origin_print <- df_origin1 |>
-      arrange(match(.data$country, c(rev(origin_order), "Others")))
+      arrange(match(.data$country, c(rev(origin_order), "Others"))) |>
+      rename(Origin = .data$country)
 
     output$data <- bind_rows(df_destin, df_origin) |>
       mutate(share = 100 * .data$n / sum(.data$n), .by = .data$panel)
+
     output$print <- bind_rows(df_destin_print, df_origin_print) |>
-      mutate(share = .data$n / sum(.data$n), .by = .data$panel) |>
+      mutate(
+        Country = countryname(iso, to = "name_text"),
+        share = .data$n / sum(.data$n), .by = .data$panel
+      ) |>
       select(
-        Panel = .data$panel,
-        Country = .data$country,
+        .data$Country,
+        .data$Destination,
+        .data$Origin,
         Region = .data$region,
         Count = .data$n,
         Share = .data$share
@@ -179,7 +186,7 @@ gdi_plot_data <- function(key, iso) {
 
     if (nrow(output$data) > 0) {
       output$print <- output$data |>
-        mutate(country = countryname(.data$geo, to = "name_text")) |>
+        mutate(country = gdidata::countryname(.data$geo, to = "name_text")) |>
         select(
           Country = .data$country,
           Year = .data$t,
@@ -209,7 +216,7 @@ gdi_plot_data <- function(key, iso) {
 
     if (nrow(output$data) > 0) {
       output$print <- output$data |>
-        mutate(Country = countryname(.data$geo, to = "name_sort")) |>
+        mutate(Country = gdidata::countryname(.data$geo, to = "name_sort")) |>
         select(.data$Country, Year = .data$t, .data$cause, .data$n) |>
         pivot_wider(names_from = .data$cause, values_from = .data$n) |>
         arrange(.data$Year)
@@ -258,8 +265,8 @@ gdi_plot_data <- function(key, iso) {
         mutate(geo = iso, cause = "Total")
 
       output$print <- bind_rows(output$data, agg) |>
-        mutate(Country = countryname(.data$geo, to = "name_text")) |>
-        select(-.data$geo) |>
+        mutate(Country = gdidata::countryname(.data$geo, to = "name_text")) |>
+        select(.data$Country, .data$Cause, .data$t, .data$n) |>
         arrange(.data$t) |>
         pivot_wider(names_from = .data$t, values_from = .data$n) |>
         rename(Cause = .data$cause) |>
@@ -293,7 +300,7 @@ gdi_plot_data <- function(key, iso) {
     output$data <- bind_rows(
 
       gdidata::unhcr |>
-        left_join(countrynames, by = c("geo" = "iso3")) |>
+        left_join(gdidata::countrynames, by = c("geo" = "iso3")) |>
         filter(.data$from == iso & .data$group == "refugee") |>
         summarise(
           n = sum(.data$n),
@@ -306,7 +313,7 @@ gdi_plot_data <- function(key, iso) {
         rename(geo = .data$from),
 
       gdidata::unhcr |>
-        left_join(countrynames, by = c("from" = "iso3")) |>
+        left_join(gdidata::countrynames, by = c("from" = "iso3")) |>
         filter(.data$geo == iso & .data$group == "refugee") |>
         summarise(
           n = sum(.data$n),
@@ -320,12 +327,18 @@ gdi_plot_data <- function(key, iso) {
 
     if (nrow(output$data) > 0) {
 
-      output$print <- output$data |>
+      agg <- output$data |>
+        summarise(n = sum(.data$n), .by = c(.data$t, .data$panel)) |>
+        mutate(region = "Total")
+
+      output$print <- bind_rows(agg, output$data) |>
         mutate(Panel = ifelse(.data$panel == "orig", panel_orig, panel_host)) |>
-        arrange(.data$t) |>
         select(.data$Panel, Region = .data$region, .data$t, .data$n) |>
-        pivot_wider(names_from = .data$t, values_from = .data$n) |>
-        arrange(.data$Panel, match(.data$Region, names(regions)))
+        arrange(
+          .data$Panel,
+          .data$t, match(.data$Region, c("Total", names(regions)))
+        ) |>
+        pivot_wider(names_from = .data$Region, values_from = .data$n)
     }
 
     output$range <- ranger(gdidata::unhcr)
